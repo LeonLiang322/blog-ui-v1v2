@@ -1,0 +1,40 @@
+// 使用Vuetify主题中的$body-font-family变量来设置字体
+@use 'vuetify' with (
+  $body-font-family: 'SmileySans',
+);
+
+
+// 定义动态letter-spacing属性的mixin
+@mixin letter-spacing($spacing) {
+  letter-spacing: #{$spacing}px;
+}
+
+// 定义全局样式类
+:root {
+  // 定义letter-spacing类名及其对应的值
+  @for $i from 1 through 10 {
+    .ls-#{$i} {
+      @include letter-spacing($i);
+    }
+  }
+}
+
+// 导入自定义的字体
+@font-face {
+  font-family: 'SmileySans';
+  src: url('../fonts/SmileySans.otf');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'HarmonySans';
+  src: url('../fonts/HarmonySans.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'HonorSans';
+  src: url('../fonts/HonorSans.ttf');
+  font-weight: normal;
+  font-style: normal;
+}

@@ -1,0 +1,41 @@
+.markdown-body {
+  font-family: 'HarmonySans', sans-serif;
+  background-color: transparent;
+}
+
+.markdown-body h1,
+.markdown-body h2 {
+  color: #FED504;
+  border-left: 3px solid #FED504;
+  border-bottom: 3px solid #FED504;
+  padding-left: .75rem;
+}
+
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  color: #FED504;
+  border-left: 3px solid #FED504;
+  border-bottom: none;
+  padding-left: .75rem;
+}
+
+.markdown-body p img {
+  width: 100%;
+  max-width: 600px;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+  border-radius: 5px;
+}
+
+.markdown-body del {
+  text-decoration-color: #FED504;
+}
+
+.markdown-body a {
+  color: #FED504;
+}
+
+
