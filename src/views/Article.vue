@@ -152,7 +152,8 @@ onMounted(() => {
           :model-value="input"
           :rules="[rules.limit]"
           placeholder="请文明发言哦~"
-          counter="50"
+          maxlength="200"
+          counter
           auto-grow
           rows="1"
           row-height="15"

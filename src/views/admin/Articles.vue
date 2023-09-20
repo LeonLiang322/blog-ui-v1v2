@@ -64,6 +64,7 @@ const {
   },
   onSuccess: () => {
     // panels.value = null;
+    window.scrollTo(0, 0);
     sessionStorage.setItem('a_a_current', current.value.toString());
   }
 });
@@ -475,7 +476,8 @@ onMounted(() => {
                 <v-form ref="uploadForm" validate-on="input lazy" @submit.prevent>
                   <v-text-field
                       v-model="title"
-                      counter="20"
+                      maxlength="20"
+                      counter
                       :rules="titleRules"
                       :loading="titleExistLoading"
                       label="标题"
@@ -483,7 +485,8 @@ onMounted(() => {
                       :autofocus="!editId"/>
                   <v-text-field
                       v-model="subtitle"
-                      counter="40"
+                      maxlength="40"
+                      counter
                       :rules="[v => (!v || v.length <= 40) || '副标题不可超过40字']"
                       label="副标题"
                       clearable />
@@ -546,7 +549,7 @@ onMounted(() => {
   </v-dialog>
 
   <v-expansion-panels v-if="articles" v-model="panels" class="mb-4">
-    <v-expansion-panel v-for="article in articles.records" :value="article.id">
+    <v-expansion-panel v-for="article in articles.records" :key="article.id">
       <v-expansion-panel-title>
         <template v-slot:actions="{ expanded }">
           <v-icon :icon="expanded ? 'mdi-close' : 'mdi-magnify'"></v-icon>
@@ -606,10 +609,22 @@ onMounted(() => {
           </v-row>
           <v-row>
             <v-col cols="12" class="d-flex justify-start align-center">
-              <v-btn :loading="getArticleLoading" size="large" density="comfortable" @click="handleEdit(article.id)">
+              <v-btn
+                  :disabled="getTKeyLoading"
+                  :loading="getArticleLoading"
+                  size="large"
+                  density="comfortable"
+                  @click="handleEdit(article.id)">
                 <v-icon size="large">mdi-pencil-outline</v-icon>
               </v-btn>
-              <v-btn class="ml-4" :loading="getTKeyLoading" color="error" size="large" density="comfortable" @click="onDelete(article)">
+              <v-btn
+                  class="ml-4"
+                  :disabled="getArticleLoading"
+                  :loading="getTKeyLoading"
+                  color="error"
+                  size="large"
+                  density="comfortable"
+                  @click="onDelete(article)">
                 <v-icon size="large">mdi-trash-can-outline</v-icon>
               </v-btn>
             </v-col>
@@ -617,16 +632,16 @@ onMounted(() => {
         </v-container>
       </v-expansion-panel-text>
     </v-expansion-panel>
-    <v-overlay
-        :model-value="getArticlesLoading"
-        contained
-        class="rounded align-center justify-center">
-      <v-progress-circular
-          indeterminate
-          color="primary" />
-    </v-overlay>
+    <!--<v-overlay-->
+    <!--    :model-value="getArticlesLoading"-->
+    <!--    contained-->
+    <!--    class="rounded align-center justify-center">-->
+    <!--  <v-progress-circular-->
+    <!--      indeterminate-->
+    <!--      color="primary" />-->
+    <!--</v-overlay>-->
   </v-expansion-panels>
-  <v-card v-else text="加载中..." />
+  <!--<v-card v-else text="加载中..." />-->
 
   <div class="text-center">
     <v-pagination
@@ -634,6 +649,11 @@ onMounted(() => {
         :disabled="getArticlesLoading"
         :length="totalPage"
         :total-visible="6" />
+    <v-progress-linear
+        v-if="getArticlesLoading"
+        class="w-100"
+        indeterminate
+        color="white" />
   </div>
 </div>
 </template>

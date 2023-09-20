@@ -55,6 +55,7 @@ const {
     totalPageKey: 'pages'
   },
   onSuccess: () => {
+    window.scrollTo(0, 0);
     sessionStorage.setItem('a_p_current', current.value.toString());
   }
 });
@@ -361,14 +362,16 @@ onMounted(() => {
               <v-form ref="uploadForm" validate-on="input lazy" @submit.prevent>
                 <v-text-field
                     v-model="title"
-                    counter="20"
+                    maxlength="20"
+                    counter
                     :rules="titleRules"
                     label="标题"
                     clearable
                     :autofocus="!editId"/>
                 <v-textarea
                     v-model="content"
-                    counter="100"
+                    maxlength="100"
+                    counter
                     :rules="[v => (!v || v.length <= 100) || '配文不可超过100字']"
                     label="配文"
                     clearable
@@ -385,62 +388,81 @@ onMounted(() => {
         </v-card-text>
       </v-card>
     </v-dialog>
+    <v-container v-if="photos">
+      <v-row>
+        <v-col
+            v-for="photo in photos.records"
+            :value="photo.id"
+            cols="12"
+            sm="4">
+          <v-hover v-slot="{ isHovering, props }">
+            <v-card class="overflow-x-auto" v-bind="props">
+              <div class="h-100 d-flex flex-no-wrap justify-space-between">
+                <div class="w-100">
+                  <v-img
+                      height="130"
+                      :src="photo.url"
+                      aspect-ratio="1"
+                      cover>
+                    <template v-slot:placeholder>
+                      <v-row
+                          class="fill-height ma-0"
+                          align="center"
+                          justify="center">
+                        <v-progress-circular indeterminate color="primary" />
+                      </v-row>
+                    </template>
+                  </v-img>
+                  <v-card-title class="text-h6 text-primary">
+                    {{photo.title}}
+                  </v-card-title>
+                  <v-card-text>
+                    <p v-if="photo.content">{{ photo.content }}</p>
+                    <v-icon v-else size="small">mdi-circle-outline</v-icon>
+                  </v-card-text>
+                  <v-overlay
+                      class="align-center justify-center"
+                      :model-value="isHovering"
+                      contained>
+                    <v-btn
+                        color="blue"
+                        size="large"
+                        @click="api({ images: [photo.url] })">
+                      <v-icon size="large">mdi-magnify</v-icon>
+                    </v-btn>
+                    <v-btn
+                        class="ml-8"
+                        :disabled="getPKeyLoading"
+                        :loading="getPhotoLoading"
+                        size="large"
+                        @click="handleEdit(photo.id)">
+                      <v-icon size="large">mdi-pencil-outline</v-icon>
+                    </v-btn>
+                    <v-btn
+                        class="ml-8"
+                        :disabled="getPhotoLoading"
+                        :loading="getPKeyLoading"
+                        color="error"
+                        size="large"
+                        @click="onDelete(photo)">
+                      <v-icon size="large">mdi-trash-can-outline</v-icon>
+                    </v-btn>
+                  </v-overlay>
 
-    <v-row v-if="photos">
-      <v-col
-          v-for="photo in photos.records"
-          :value="photo.id"
-          cols="12"
-          sm="4">
-        <v-hover v-slot="{ isHovering, props }">
-          <v-card class="overflow-x-auto" v-bind="props">
-            <div class="h-100 d-flex flex-no-wrap justify-space-between">
-              <div class="w-100">
-                <v-img
-                    height="120"
-                    :src="photo.url"
-                    aspect-ratio="1"
-                    cover>
-                  <template v-slot:placeholder>
-                    <v-row
-                        class="fill-height ma-0"
-                        align="center"
-                        justify="center">
-                      <v-progress-circular indeterminate color="primary" />
-                    </v-row>
-                  </template>
-                </v-img>
-                <v-card-title class="text-h6 text-primary">
-                  {{photo.title}}
-                </v-card-title>
-                <v-card-text>
-                  <p v-if="photo.content">{{ photo.content }}</p>
-                  <v-icon v-else size="small">mdi-circle-outline</v-icon>
-                </v-card-text>
-                <v-overlay
-                    class="align-center justify-center"
-                    :model-value="isHovering"
-                    contained>
-                  <v-btn color="blue" size="large" @click="api({ images: [photo.url] })">
-                    <v-icon size="large">mdi-magnify</v-icon>
-                  </v-btn>
-                  <v-btn class="ml-8" :loading="getPhotoLoading" size="large" @click="handleEdit(photo.id)">
-                    <v-icon size="large">mdi-pencil-outline</v-icon>
-                  </v-btn>
-                  <v-btn class="ml-8" :loading="getPKeyLoading" color="error" size="large" @click="onDelete(photo)">
-                    <v-icon size="large">mdi-trash-can-outline</v-icon>
-                  </v-btn>
-                </v-overlay>
-
+                </div>
               </div>
-            </div>
-          </v-card>
-        </v-hover>
-      </v-col>
-    </v-row>
-    <v-card v-else text="加载中..." />
+            </v-card>
+          </v-hover>
+        </v-col>
+      </v-row>
+    </v-container>
 
     <div class="mt-4 text-center">
+      <v-progress-linear
+          v-show="getPhotosLoading"
+          class="w-75 mb-2"
+          indeterminate
+          color="white" />
       <v-pagination
           v-model="current"
           :disabled="getPhotosLoading"
