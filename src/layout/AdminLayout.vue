@@ -29,12 +29,16 @@ const links = [
     icon: 'mdi-camera-wireless-outline'
   },{
     title: '动态',
-    value: 'sentences',
-    icon: 'mdi-account-question-outline'
+    value: 'journals',
+    icon: 'mdi-comment-text-outline'
   },{
     title: '标签',
     value: 'tags',
     icon: 'mdi-tag-outline'
+  },{
+    title: '版本',
+    value: 'versions',
+    icon: 'mdi-update'
   }
 ];
 const lock = ref(false);
@@ -103,7 +107,12 @@ onBeforeUnmount(() => {
         expand-on-hover
         rail>
       <v-list density="comfortable" nav>
-        <v-list-item v-for="link in links" :prepend-icon="link.icon" :title="link.title" @click="handleMenu(link.value)"></v-list-item>
+        <v-list-item
+            v-for="link in links"
+            density="default"
+            :prepend-icon="link.icon"
+            :title="link.title"
+            @click="handleMenu(link.value)" />
       </v-list>
     </v-navigation-drawer>
 

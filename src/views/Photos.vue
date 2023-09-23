@@ -1,72 +1,48 @@
 <script setup>
 import req from "@/utils/handleReq";
-import {useLoadMore, useRequest} from "vue-request";
-import {inject, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import { usePagination } from "vue-request";
+import { inject, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
-// const getPhotoService = async () => {
-//   const results = await req.sys.get('/photos', { page: page.value, size: 12 });
-//   return results.data.data;
-// }
+const getPhotosService = async () => {
+  const result = await req.sys.get('/photos', { page: current.value, size: 12 });
+  return result.data.data;
+}
 
-// const page = ref(1);
-// const total = ref(0);
-// const images = ref([]);
 const divRef = ref();
 const columns = ref([]);
 const columnCount = ref(3);
-// const btnVis = ref(true);
 
-const getPhotosService = async (data) => {
-  const _page = data?.page ? data.page + 1 : 1;
-  const result = await req.sys.get('/photos', {page: _page, size: 10});
-  return {
-    list: result.data.data.records,
-    page: _page,
-    total: result.data.data.pages,
-  }
-}
-
+// 分页获取照片
 const {
-  data,
-  dataList: images,
+  data: photos,
+  current,
+  totalPage,
   loading,
-  loadingMore,
-  noMore,
-  loadMore
-} = useLoadMore(getPhotosService, {
-  manual: false,
-  isNoMore: (d) => {
-    return d?.page === d?.total;
+  changeCurrent
+} = usePagination(getPhotosService, {
+  pagination: {
+    currentKey: 'current',
+    totalPageKey: 'pages'
   },
   onSuccess: () => {
+    if (current.value > totalPage.value) {
+      current.value--;
+      changeCurrent(current.value);
+      return;
+    }
+    columns.value = [];
+    window.scrollTo(0, 0);
+    sessionStorage.setItem('p_cur', current.value.toString());
     rearrangeColumns();
   }
 });
-
-// const {
-//   data: photos,
-//   loading,
-//   run: getRun,
-// } = useRequest(getPhotoService, {
-//   cacheKey: 'photos',
-//   cacheTime: 5 * 60 * 1000,
-//   onSuccess: (resp) => {
-//     images.value.push(...resp.records);
-//     total.value = resp.pages;
-//     rearrangeColumns();
-//     if (page.value >= total.value) btnVis.value = false;
-//   }
-// });
+current.value = JSON.parse(sessionStorage.getItem('p_cur'));
 
 const layoutLoading = inject('layoutLoading');
 watch(loading, (value) => {
   layoutLoading.value = value;
 });
 
-// const loadMore = () => {
-//   page.value++;
-//   getRun();
-// }
 const rearrangeColumns = () => {
   const screenWidth = divRef.value.clientWidth;
   if (screenWidth >= 1080) {
@@ -80,22 +56,22 @@ const rearrangeColumns = () => {
   } else {
     columnCount.value = 1;
   }
-
   columns.value = new Array(columnCount.value).fill(null).map(() => ({
     images: [],
   }));
-
-  images.value.forEach((image, index) => {
+  photos.value?.records.forEach((image, index) => {
     const columnIndex = index % columnCount.value;
     columns.value[columnIndex].images.push(image);
   });
 }
+
 const resizeObserver = new ResizeObserver(() => {
   rearrangeColumns();
-})
+});
+
 onMounted(() => {
   resizeObserver.observe(divRef.value);
-  document.title = 'L1am的熬夜空间 | 照片'
+  rearrangeColumns();
 });
 
 onBeforeUnmount(() => {
@@ -105,16 +81,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-
   <div ref="divRef">
-    <v-alert
-        v-if="images.length === 0"
-        color="primary"
-        icon="mdi-flask-empty-outline"
-        density="compact">
-      这里空空如也~去别的地方看看吧！
-    </v-alert>
-    <v-item-group :multiple="true">
+    <v-item-group v-if="photos" :multiple="true">
       <div class="d-flex justify-space-between" v-viewer>
         <v-item v-for="column in columns" v-slot="{ isSelected, toggle }">
           <div style="flex: 1" >
@@ -128,6 +96,14 @@ onBeforeUnmount(() => {
                       style="cursor: pointer"
                       max-height="350"
                       min-height="150">
+                    <template v-slot:placeholder>
+                      <v-row
+                          class="fill-height ma-0"
+                          align="center"
+                          justify="center">
+                        <v-progress-circular indeterminate color="primary" />
+                      </v-row>
+                    </template>
                     <v-card-title class="text-white" v-text="photo.title" />
                   </v-img>
                   <v-card-text class="mb-n4 mt-n1" style="font-size: large">
@@ -155,17 +131,34 @@ onBeforeUnmount(() => {
               </v-item>
             </v-item-group>
           </div>
-
         </v-item>
       </div>
+      <v-alert
+          v-if="photos.records.length < 1"
+          color="primary"
+          icon="mdi-flask-empty-outline"
+          density="compact">
+        这里空空如也~去别的地方看看吧！
+      </v-alert>
     </v-item-group>
-    <v-sheet v-if="images.length > 0" class="d-flex justify-center align-center py-2 bg-transparent">
-      <v-btn v-if="!noMore" @click="loadMore" :loading="loadingMore">更多</v-btn>
-      <p v-else class="ls-1">已经到达这个世界的尽头啦~</p>
-    </v-sheet>
+    <v-alert
+        v-if="!photos"
+        class="w-auto mx-auto"
+        max-width="400"
+        color="primary"
+        icon="mdi-hand-okay"
+        density="compact">
+      已经在努力加载啦~<span class="ml-4">ᓚᘏᗢ</span>
+    </v-alert>
+    <div v-else class="text-center mb-4">
+      <v-pagination
+          v-model="current"
+          size="small"
+          :disabled="loading"
+          :length="totalPage"
+          :total-visible="6" />
+    </div>
   </div>
-
-
 </template>
 
 <style scoped>

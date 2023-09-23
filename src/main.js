@@ -5,7 +5,6 @@ import store from './store'
 import { loadFonts } from './plugins/webfontloader'
 import vuetify from "@/plugins/vuetify";
 import { setGlobalOptions } from 'vue-request';
-// import './assets/css/fonts.css'
 import './assets/scss/main.scss'
 import 'viewerjs/dist/viewer.css'
 import VueViewer from 'v-viewer'
@@ -25,7 +24,8 @@ createApp(App)
   .mount('#app')
 
 router.beforeEach((to, from, next) => {
-  window.document.title = '加载中ᓚᘏᗢ'
+  // window.document.title = '加载中ᓚᘏᗢ';
+  to.meta.title && (document.title = to.meta.title);
   window.scrollTo(0, 0);
   next();
 })

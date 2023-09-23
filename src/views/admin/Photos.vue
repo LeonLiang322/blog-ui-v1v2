@@ -5,25 +5,26 @@ import req from "@/utils/handleReq";
 import store from "@/store";
 import {api} from "v-viewer";
 
+const size = 12;
 // ---------------------------------- Services & APIs ----------------------------------
 const checkFileService = async (v) => {
   const result = await req.sys.get('/photos/check-filename', { filename: v });
   return result.data.data;
 }
-const imgUploadService = async (v) => {
+const uploadImgService = async (v) => {
   const result = await req.pic.post('/upload', v);
   return result.data.data;
 }
-const imgDeleteService = async (v) => {
+const deleteImgService = async (v) => {
   const result = await req.pic.delete('/images/' + v);
   return result.data.data;
 }
-const photoUploadService = async (v) => {
+const uploadPhotoService = async (v) => {
   const result = await req.sys.post('/photos', v);
   return result.data.data;
 }
 const getPhotosService = async () => {
-  const result = await req.sys.get('/photos', { page: current.value, size: 12 });
+  const result = await req.sys.get('/photos', { page: current.value, size: size });
   return result.data.data;
 }
 const getPhotoService = async (id) => {
@@ -55,6 +56,11 @@ const {
     totalPageKey: 'pages'
   },
   onSuccess: () => {
+    if (current.value > totalPage.value) {
+      current.value--;
+      changeCurrent(current.value);
+      return;
+    }
     window.scrollTo(0, 0);
     sessionStorage.setItem('a_p_current', current.value.toString());
   }
@@ -73,24 +79,24 @@ const {
 // 上传照片至图床
 const {
   data: imgUploaded,
-  runAsync: imgUploadRun
-} = useRequest(imgUploadService, {
+  runAsync: uploadImgRun
+} = useRequest(uploadImgService, {
   defaultParams: [new FormData()],
 });
 
 // 删除图床照片
 const {
   data: imgDeleted,
-  runAsync: imgDeleteRun
-} = useRequest(imgDeleteService, {
+  runAsync: deleteImgRun
+} = useRequest(deleteImgService, {
   defaultParams: [0],
 });
 
 // 上传照片
 const {
   data: pUploaded,
-  runAsync: photoUploadRun
-} = useRequest(photoUploadService, {
+  runAsync: uploadPhotoRun
+} = useRequest(uploadPhotoService, {
   defaultParams: [{}],
 });
 
@@ -168,22 +174,7 @@ const handleUpload = async () => {
     dialog.value = true;
   }
 }
-// 上传更新文章时
-const handleReUpload = () => {
-  if (pFile.value[0].name === photoDetail.value.filename) {
-    store.dispatch('snackbar/openSnackbar', {
-      msg: '文章预览已更新',
-      type: 'success'
-    });
 
-  } else {
-    pFile.value = null;
-    store.dispatch('snackbar/openSnackbar', {
-      msg: '文件名需与源文件一致',
-      type: 'warning'
-    });
-  }
-}
 const handleUploadSubmit = async () => {
   loadingDialog.value.visible = true;
   loadingDialog.value.text = '正在进行表单验证...';
@@ -209,12 +200,11 @@ const handleUploadSubmit = async () => {
       loadingDialog.value.text = '正在上传至图床...'
       const formData = new FormData();
       formData.append('file', pFile.value[0]);
-      await imgUploadRun(formData);
-      console.log(imgUploaded.value)
+      await uploadImgRun(formData);
       data.url = imgUploaded.value?.links?.url;
       data.pKey = imgUploaded.value?.key;
       loadingDialog.value.text = '正在上传照片...'
-      await photoUploadRun(data);
+      await uploadPhotoRun(data);
       await store.dispatch('snackbar/openSnackbar', {
         msg: pUploaded.value ? '照片上传成功': '照片上传失败',
         type: pUploaded.value ? 'success': 'error'
@@ -272,7 +262,7 @@ const handleDelete = async () => {
   await deleteRun(deletePhoto.value.id);
   if (pDeleted) {
     loadingDialog.value.text = '正在删除图床图片...'
-    await imgDeleteRun(deletePhoto.value.pKey);
+    await deleteImgRun(deletePhoto.value.pKey);
   }
   await store.dispatch('snackbar/openSnackbar', {
     msg: pDeleted.value ? '照片删除成功': '照片删除失败',
@@ -288,6 +278,7 @@ const handleDelete = async () => {
   }
   loadingDialog.value.visible = false;
   deletePhoto.value = {};
+  if (photos.value.records.length <= 1) current.value--;
   changeCurrent(current.value);
 }
 
@@ -327,7 +318,6 @@ onMounted(() => {
     </v-dialog>
     <v-dialog
         v-model="loadingDialog.visible"
-        :scrim="false"
         persistent
         width="auto">
       <v-card color="primary">
@@ -392,7 +382,7 @@ onMounted(() => {
       <v-row>
         <v-col
             v-for="photo in photos.records"
-            :value="photo.id"
+            :key="photo.id"
             cols="12"
             sm="4">
           <v-hover v-slot="{ isHovering, props }">
@@ -457,17 +447,19 @@ onMounted(() => {
       </v-row>
     </v-container>
 
-    <div class="mt-4 text-center">
+    <div class="mx-auto">
       <v-progress-linear
           v-show="getPhotosLoading"
-          class="w-75 mb-2"
+          class="w-75 mt-2 mb-4"
           indeterminate
           color="white" />
-      <v-pagination
-          v-model="current"
-          :disabled="getPhotosLoading"
-          :length="totalPage"
-          :total-visible="6" />
+      <v-fade-transition>
+        <v-pagination
+            v-model="current"
+            :disabled="getPhotosLoading"
+            :length="totalPage"
+            :total-visible="6" />
+      </v-fade-transition>
     </div>
   </div>
 </template>

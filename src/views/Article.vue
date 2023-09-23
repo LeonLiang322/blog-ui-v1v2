@@ -5,6 +5,7 @@ import req from '@/utils/handleReq';
 import {useRoute} from 'vue-router';
 import 'github-markdown-css/github-markdown-dark.css'
 import '/src/assets/css/markdown.css'
+import {formatDate} from "@/utils/DateUtil";
 
 const articleClickService = async (id) => {
   return await req.sys.patch('/articles/click/' + id);
@@ -14,16 +15,6 @@ const getArticleByIdService = async (id) => {
   const results = await req.sys.get('/articles/' + id);
   return results.data.data;
 };
-
-const formatDate = (date) => {
-  const temp = new Date(date);
-  const year = temp.getFullYear();
-  const month = temp.getMonth() + 1;
-  const dates = temp.getDate();
-  const arr = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
-  const day = temp.getDay();
- return year + '年' + month + '月' + dates + '日 ' + arr[day];
-}
 
 const items = ref([
   {
@@ -54,7 +45,7 @@ const {
       disabled: true,
       href: ''
     });
-    document.title = "乱写的文章 | " + article.value.title;
+    document.title = article.value.title;
 
   },
 });
@@ -71,9 +62,9 @@ const rules = {
   limit: value => value.length < 50 || '最多只能写五十个字哦~',
 }
 
-onMounted(() => {
-  document.title = "乱写的文章 | 加载中...";
-});
+// onMounted(() => {
+//   document.title += "乱写的文章 | 加载中...";
+// });
 </script>
 
 <template>
@@ -114,8 +105,7 @@ onMounted(() => {
             </p>
             <v-slide-group show-arrows>
               <v-slide-group-item
-                  v-for="(tag, index) in article.tags"
-                  :key="index"
+                  v-for="tag in article.tags"
                   v-slot="{ isSelected, toggle }">
                 <v-chip class="ma-1" variant="elevated" size="small" rounded>
                   {{ tag.name }}
@@ -171,8 +161,5 @@ onMounted(() => {
 </template>
 
 <style scoped>
-/*.markdown-body {*/
-/*  font-family: 'HarmonySans', sans-serif;*/
-/*  background-color: transparent;*/
-/*}*/
+
 </style>

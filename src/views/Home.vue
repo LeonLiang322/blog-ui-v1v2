@@ -248,7 +248,6 @@ onMounted(() => {
         <v-tab
             :disabled="jumpDisable"
             v-for="link in links"
-            :key="link.value"
             :to="'/' + link.value">
           {{ link.title }}
         </v-tab>
@@ -298,9 +297,7 @@ onMounted(() => {
                 hide-delimiters
                 show-arrows="hover"
                 progress>
-              <v-carousel-item
-                  v-for="(sentence, i) in sentences"
-                  :key="i">
+              <v-carousel-item v-for="sentence in sentences">
                 <div class="d-flex align-center justify-center h-100">
                   <v-card class="px-16 elevation-0">
                     <v-card-item class="mb-0">

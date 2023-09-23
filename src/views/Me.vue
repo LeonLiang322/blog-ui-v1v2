@@ -1,40 +1,51 @@
 <script setup>
 import req from "@/utils/handleReq";
-import {useLoadMore, useRequest} from "vue-request";
-import {computed, inject, onMounted, ref, watch} from "vue";
+import { useLoadMore } from "vue-request";
+import { inject, ref, watch } from "vue";
 import router from "@/router";
+import {formatDate, formatOnlyDate} from "@/utils/DateUtil";
 const panel = ref(null);
 
 const getSentencesService = async (data) => {
   const _page = data?.page ? data.page + 1 : 1;
-  const result = await req.sys.get('/sentences', {page: _page, size: 10});
+  const result = await req.sys.get('/sentences/page', { page: _page, size: 10 });
   return {
     list: result.data.data.records,
     page: _page,
     total: result.data.data.pages,
   }
 }
-const getVersionService = async () => {
-  const result =  await req.sys.get('/general/version');
-  return result.data.data;
+
+const getVersionsService = async (data) => {
+  const _page = data?.page ? data.page + 1 : 1;
+  const result = await req.sys.get('/general/versions', { page: _page, size: 3 });
+  return {
+    list: result.data.data.records,
+    page: _page,
+    total: result.data.data.pages,
+  }
 }
 
 const {
-  data: versions,
-  loading: versionLoading
-} = useRequest(getVersionService, {
-  manual: false
-})
+  dataList: versions,
+  loadingMore: vLoadingMore,
+  noMore: vNoMore,
+  loadMore: vLoadMore
+} = useLoadMore(getVersionsService, {
+  manual: false,
+  isNoMore: (d) => {
+    return d?.page === d?.total;
+  },
+});
 
 const colors = ['green', 'blue', 'yellow', 'orange', 'red'];
 
 const {
-  data,
   dataList: sentences,
-  loading,
-  loadingMore,
-  noMore,
-  loadMore,
+  loading: sLoading,
+  loadingMore: sLoadingMore,
+  noMore: sNoMore,
+  loadMore: sLoadMore,
 } = useLoadMore(getSentencesService, {
   manual: false,
   isNoMore: (d) => {
@@ -48,7 +59,7 @@ const {
 });
 
 const layoutLoading = inject('layoutLoading');
-watch(loading, (value) => {
+watch(sLoading, (value) => {
   layoutLoading.value = value;
 });
 
@@ -56,23 +67,19 @@ const jump = (path, query) => {
   router.push({path: path, query: query});
 }
 
-onMounted(() => {
-  document.title = "L1am的熬夜空间 | 我与这个博客"
-});
 </script>
 
 <template>
   <div>
     <v-sheet class="mb-4 pt-4 pb-6 rounded text-center ls-3">
       <div class="greeting text-h5 my-2">Hiiya~</div>
-      <div class="text-h4 d-inline">这里是L1am Liang </div>
+      <div class="text-h4 d-inline">这里是Leon Liang </div>
       <span>( ′ 3`)</span>
     </v-sheet>
     <v-divider class="my-4"></v-divider>
     <v-expansion-panels
         v-model="panel"
         :multiple="true"
-        variant="popout"
         mandatory
         class="my-4">
       <v-expansion-panel key="blog">
@@ -146,21 +153,27 @@ onMounted(() => {
             </v-card-title>
             <v-card-text v-if="versions" class="d-flex justify-start mt-4">
               <p v-if="versions.length === 0">什么？怎么可能没有版本更新记录！！一定是系统又出Bug了(っ °Д °;)っ</p>
-              <v-timeline class="overflow-auto mt-1 py-2" side="end" align="start" truncate-line="both">
+              <v-timeline class="overflow-auto py-2" side="end" align="start" truncate-line="both">
                 <v-timeline-item
                     v-for="version in versions"
+                    density="compact"
                     :dot-color="colors[version.level]"
-                    size="16"
+                    size="x-small"
                     fill-dot>
-                  <div class="text-no-wrap mt-n1">
-                    <span>{{ version.date }}</span>
-                    <v-chip
-                        class="mx-4 align-self-center mt-n1"
-                        variant="outlined"
-                        rounded
-                        size="small">V {{ version.version }}</v-chip>
+                  <div class="d-inline-flex text-no-wrap">
+                    <div style="width: 90px">{{ formatOnlyDate(version.date) }}</div>
+                    <div style="width: 50px" class="mx-4 text-primary text-decoration-underline ls-2">V {{ version.version }}</div>
                     <span>{{ version.detail }}</span>
                   </div>
+                </v-timeline-item>
+                <v-timeline-item
+                    v-if="!vNoMore"
+                    density="compact"
+                    dot-color="white"
+                    icon="mdi-dots-vertical"
+                    size="16"
+                    fill-dot>
+                  <v-btn class="mt-n2" size="small" :loading="vLoadingMore" @click="vLoadMore">更早版本记录</v-btn>
                 </v-timeline-item>
               </v-timeline>
             </v-card-text>
@@ -203,30 +216,33 @@ onMounted(() => {
           </v-card>
         </v-expansion-panel-text>
       </v-expansion-panel>
-      <v-expansion-panel key="sentence">
+      <v-expansion-panel class="pb-4" key="sentence">
         <v-expansion-panel-title
             class="text-h6"
             color="primary"
             collapse-icon="mdi-comment">
-          日常吐槽
+          动态
         </v-expansion-panel-title>
         <v-expansion-panel-text class="pa-0">
           <p v-if="sentences.length === 0" class="my-4">还没有吐槽过呢...</p>
           <v-timeline
               v-else
+              class="justify-start mt-2"
+              density="compact"
               side="end"
-              :truncate-line="noMore ? 'both' : 'start'"
-              class="justify-start mt-2">
+              :truncate-line="sNoMore ? 'both' : 'start'">
             <v-timeline-item
                 v-for="sentence in sentences"
-                :key="sentence.id"
                 size="small"
                 dot-color="primary"
                 icon="mdi-emoticon-kiss-outline"
                 fill-dot>
-              <p class="ma-1 ls-1">{{ sentence.date }}</p>
-              <v-card class="pa-0" color="background">
-                <v-card-text class="pa-3">{{sentence.content}}</v-card-text>
+              <v-card class="mb-n1 px-4" color="background">
+                <v-card-text class="pa-3">
+                  <p style="font-size: 1rem" class="ls-1">{{sentence.content}}</p>
+                  <v-icon size="x-small" color="grey">mdi-calendar-today-outline</v-icon>
+                  <span class="ml-1 ls-1 text-grey">{{ formatDate(sentence.date) }}</span>
+                </v-card-text>
               </v-card>
             </v-timeline-item>
             <v-timeline-item
@@ -234,14 +250,13 @@ onMounted(() => {
                 dot-color="primary"
                 icon="mdi-emoticon-kiss-outline"
                 fill-dot>
-              <v-btn v-if="!noMore" @click="loadMore" :loading="loadingMore">更多</v-btn>
-              <p v-else class="ls-1">已经到达这个世界的尽头啦~</p>
+              <v-btn v-if="!sNoMore" density="comfortable" @click="sLoadMore" :loading="sLoadingMore">加载更多</v-btn>
+              <p v-else class="ls-1">没有更多啦~</p>
             </v-timeline-item>
           </v-timeline>
         </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
-
   </div>
 </template>
 
@@ -251,13 +266,11 @@ onMounted(() => {
 }
 a {
   cursor: pointer;
-  font-family: 'HarmonySans', sans-serif;
 }
 .v-expansion-panel-title {
   height: 40px;
 }
 .v-card-text {
-  font-family: 'HarmonySans', sans-serif;
   line-height: 1.5rem;
 }
 @keyframes rainbow {
@@ -268,7 +281,7 @@ a {
     color: #FED504;
   }
   100% {
-  color: #76FF03;
-}
+    color: #76FF03;
+  }
 }
 </style>

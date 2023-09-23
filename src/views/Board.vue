@@ -3,7 +3,7 @@
 import {onMounted} from "vue";
 
 onMounted(() => {
-  document.title = "L1am的熬夜空间 | 留言板";
+  document.title = "Leon的熬夜空间 | 留言板";
 });
 </script>
 

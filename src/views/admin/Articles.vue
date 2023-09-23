@@ -1,10 +1,11 @@
 <script setup>
-import {onMounted, reactive, ref} from "vue";
-import {usePagination, useRequest} from "vue-request";
+import { onMounted, ref } from "vue";
+import { usePagination, useRequest } from "vue-request";
 import req from "@/utils/handleReq";
 import store from "@/store";
-import {api} from "v-viewer";
+import { api } from "v-viewer";
 
+const size = 10;
 // ---------------------------------- Services & APIs ----------------------------------
 const checkTitleService = async v => {
   const result = await req.sys.get('/articles/check-title', { title: v });
@@ -18,28 +19,29 @@ const getTagsService = async () => {
   const result = await req.sys.get('/tags/list');
   return result.data.data;
 }
-const imgUploadService = async v => {
+const uploadImgService = async v => {
   const result = await req.pic.post('/upload', v);
   return result.data.data;
 }
-const imgDeleteService = async v => {
+const deleteImgService = async v => {
   const result = await req.pic.delete('/images/' + v);
   return result.data.data;
 }
-const articleUploadService = async v => {
+const uploadArticleService = async v => {
   const result = await req.sys.post('/articles', v);
   return result.data.data;
 }
 const getArticlesService = async () => {
-  const result = await req.sys.get('/articles', { page: current.value, size: 10 });
+  const result = await req.sys.get('/articles', { page: current.value, size: size });
   return result.data.data;
 }
 const getArticleService = async id => {
   const result = await req.sys.get('/articles/' + id);
   return result.data.data;
 }
-const deleteArticleService = id => {
-  return req.sys.delete('/articles/' + id);
+const deleteArticleService = async id => {
+  const result = req.sys.delete('/articles/' + id);
+  return result.data.data;
 }
 const getArticleTKeyService = async id => {
   const result = await req.sys.get('/articles/tKey/' + id);
@@ -63,7 +65,11 @@ const {
     totalPageKey: 'pages'
   },
   onSuccess: () => {
-    // panels.value = null;
+    if (current.value > totalPage.value) {
+      current.value--;
+      changeCurrent(current.value);
+      return;
+    }
     window.scrollTo(0, 0);
     sessionStorage.setItem('a_a_current', current.value.toString());
   }
@@ -99,24 +105,24 @@ const {
 // 上传预览图至图床
 const {
   data: tUploaded,
-  runAsync: imgUploadRun
-} = useRequest(imgUploadService, {
+  runAsync: uploadImgRun
+} = useRequest(uploadImgService, {
   defaultParams: [new FormData()],
 });
 
 // 删除图床预览图
 const {
   data: tDeleted,
-  runAsync: imgDeleteRun
-} = useRequest(imgDeleteService, {
+  runAsync: deleteImgRun
+} = useRequest(deleteImgService, {
   defaultParams: [0],
 });
 
 // 上传文章
 const {
   data: aUploaded,
-  runAsync: articleUploadRun
-} = useRequest(articleUploadService, {
+  runAsync: uploadArticleRun
+} = useRequest(uploadArticleService, {
   defaultParams: [{}],
 });
 
@@ -251,7 +257,7 @@ const handleReUpload = () => {
     });
   }
 }
-// 封面
+// 封面图转url
 const handleUploadThumbnail = () => {
   if (thumbnail.value[0]) thumbnailUrl.value = URL.createObjectURL(thumbnail.value[0]);
 }
@@ -275,7 +281,7 @@ const handleUploadSubmit = async () => {
         // 当存在旧封面图时执行删除
         if (tKey.value) {
           loadingDialog.value.text = '正在删除旧封面...';
-          await imgDeleteRun(tKey.value)
+          await deleteImgRun(tKey.value)
         }
         // 若不存在旧封面图 或 旧封面图已删除
         if (tKey.value === null || tDeleted.value) {
@@ -283,7 +289,7 @@ const handleUploadSubmit = async () => {
           const formData = new FormData();
           formData.append('file', thumbnail.value[0]);
           formData.append('album_id', 4);
-          await imgUploadRun(formData);
+          await uploadImgRun(formData);
           // 表单数据添加封面信息
           data.thumbnail = tUploaded.value?.links?.url;
           data.tKey = tUploaded.value?.key;
@@ -306,7 +312,7 @@ const handleUploadSubmit = async () => {
         const formData = new FormData();
         formData.append('file', thumbnail.value[0]);
         formData.append('album_id', 4);
-        await imgUploadRun(formData);
+        await uploadImgRun(formData);
         // 表单数据添加封面信息
         data.thumbnail = tUploaded.value?.links?.url;
         data.tKey = tUploaded.value?.key;
@@ -315,7 +321,7 @@ const handleUploadSubmit = async () => {
       data.tagIds = tagIds.value;
       data.filename = aFile.value[0]?.name;
       loadingDialog.value.text = '正在上传文章...'
-      await articleUploadRun(data);
+      await uploadArticleRun(data);
       await store.dispatch('snackbar/openSnackbar', {
         msg: aUploaded.value ? '文章上传成功': '文章上传失败',
         type: aUploaded.value ? 'success': 'error'
@@ -335,12 +341,6 @@ const handleUploadSubmit = async () => {
 
 // ---------------------------------- 文章更新 ----------------------------------
 const editId = ref(null);
-
-// watch(panels, (newValue, oldValue) => {
-//   if (newValue !== undefined) {
-//     console.log(newValue);
-//   }
-// })
 
 const handleEdit = async id => {
   await getArticleRun(id);
@@ -380,7 +380,7 @@ const handleDelete = async () => {
   await deleteRun(deleteArticle.value.id);
   if (aDeleted && deleteArticle.value?.tKey) {
     loadingDialog.value.text = '正在删除封面...'
-    await imgDeleteRun(deleteArticle.value.tKey);
+    await deleteImgRun(deleteArticle.value.tKey);
   }
   await store.dispatch('snackbar/openSnackbar', {
     msg: aDeleted.value ? '文章删除成功': '文章删除失败',
@@ -396,6 +396,7 @@ const handleDelete = async () => {
   }
   loadingDialog.value.visible = false;
   deleteArticle.value = {};
+  if (articles.value.records.length <= 1) current.value--;
   changeCurrent(current.value);
 }
 
@@ -435,7 +436,6 @@ onMounted(() => {
   </v-dialog>
   <v-dialog
       v-model="loadingDialog.visible"
-      :scrim="false"
       persistent
       width="auto">
     <v-card color="primary">
@@ -587,8 +587,8 @@ onMounted(() => {
               <v-icon v-if="article.tags.length === 0" size="small">mdi-circle-outline</v-icon>
               <v-slide-group show-arrows>
                 <v-slide-group-item
-                    v-for="(tag, index) in article.tags"
-                    :key="index">
+                    v-for="tag in article.tags"
+                    :key="tag.id">
                   <v-chip class="ma-1" variant="elevated" rounded>
                     {{ tag.name }}
                   </v-chip>
@@ -632,28 +632,21 @@ onMounted(() => {
         </v-container>
       </v-expansion-panel-text>
     </v-expansion-panel>
-    <!--<v-overlay-->
-    <!--    :model-value="getArticlesLoading"-->
-    <!--    contained-->
-    <!--    class="rounded align-center justify-center">-->
-    <!--  <v-progress-circular-->
-    <!--      indeterminate-->
-    <!--      color="primary" />-->
-    <!--</v-overlay>-->
   </v-expansion-panels>
-  <!--<v-card v-else text="加载中..." />-->
 
-  <div class="text-center">
-    <v-pagination
-        v-model="current"
-        :disabled="getArticlesLoading"
-        :length="totalPage"
-        :total-visible="6" />
+  <div class="mx-auto">
     <v-progress-linear
-        v-if="getArticlesLoading"
-        class="w-100"
+        v-show="getArticlesLoading"
+        class="w-75 mt-2 mb-4"
         indeterminate
         color="white" />
+    <v-fade-transition>
+      <v-pagination
+          v-model="current"
+          :disabled="getArticlesLoading"
+          :length="totalPage"
+          :total-visible="6" />
+    </v-fade-transition>
   </div>
 </div>
 </template>

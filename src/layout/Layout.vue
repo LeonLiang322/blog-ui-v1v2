@@ -19,11 +19,12 @@ const handleDialog = () => {
 }
 
 const links = [
+  // {
+  //   title: '简陋的主页',
+  //   value: 'home',
+  //   icon: 'mdi-view-dashboard-outline'
+  // },
   {
-    title: '简陋的主页',
-    value: 'home',
-    icon: 'mdi-view-dashboard-outline'
-  },{
     title: '乱写的文章',
     value: 'articles',
     icon: 'mdi-notebook-outline',
@@ -207,7 +208,7 @@ onBeforeUnmount(() => {
         class="bg-primary elevation-8">
       <v-app-bar-nav-icon class="bg-surface ml-4 mr-3" size="x-small" @click="handleCollapse">
         <v-icon color="white">mdi-menu</v-icon>
-        <v-tooltip activator="parent" location="bottom">{{ rail ? '展开' : '收起' }}</v-tooltip>
+        <v-tooltip v-if="!phone" activator="parent" location="bottom">{{ rail ? '展开' : '收起' }}</v-tooltip>
       </v-app-bar-nav-icon>
       <v-app-bar-nav-icon
           :class="lock ? 'bg-error' : 'bg-surface'"
@@ -215,9 +216,9 @@ onBeforeUnmount(() => {
           icon="mdi-lock-outline"
           @click="lock = !lock">
         <v-icon color="white">{{ lock ? 'mdi-lock-outline' : 'mdi-lock-open-outline' }}</v-icon>
-        <v-tooltip activator="parent" location="bottom">{{ lock ? '解锁' : '锁定' }}</v-tooltip>
+        <v-tooltip v-if="!phone" activator="parent" location="bottom">{{ lock ? '解锁' : '锁定' }}</v-tooltip>
       </v-app-bar-nav-icon>
-      <v-toolbar-title class="toolbar-title">L1am的熬夜空间</v-toolbar-title>
+      <v-toolbar-title class="toolbar-title">Leon 的熬夜空间</v-toolbar-title>
       <!--<div v-if="!barCollapse" class="mr-4">-->
       <!--  <v-btn-->
       <!--      density="default"-->
@@ -257,7 +258,7 @@ onBeforeUnmount(() => {
             <v-avatar class="avatar mx-auto mt-10 elevation-5" size="150" @click="router.push('/me')">
               <v-img src="../assets/images/my-avatar.jpg" alt="my-avatar"/>
             </v-avatar>
-            <p class="mt-4 ls-2">Liam Liang</p>
+            <p class="mt-4 ls-2">Leon Liang</p>
           </v-col>
           <v-col cols="12"></v-col>
           <v-col cols="12">
@@ -320,8 +321,8 @@ onBeforeUnmount(() => {
     <v-main class="d-flex align-center justify-center w-100">
       <v-container class="px-6">
         <router-view class="main" />
-        <v-sheet v-if="!loading" class="footer mt-2 py-1 bg-transparent d-flex justify-center align-center ls-1">
-          <span>© 2023 Copyright LiamLiang</span>
+        <v-sheet class="footer mt-2 py-1 bg-transparent d-flex justify-center align-center ls-1">
+          <span>© 2023 Copyright Leon Liang</span>
           <v-divider :vertical="true" class="mx-3" thickness="2" />
           <a href="https://beian.miit.gov.cn/" target="_blank">闽ICP备2023005455号-1</a>
           <v-divider :vertical="true" class="mx-3" thickness="2" />
@@ -369,13 +370,14 @@ onBeforeUnmount(() => {
 }
 .main {
   min-width: 300px;
+  min-height: 80vh;
 }
 .avatar {
   transition: all .2s ease-in-out;
 }
 .avatar:hover {
   cursor: pointer;
-  transform: rotate(45deg);
+  transform: rotate(-45deg);
 }
 .footer {
   font-size: 12px;
