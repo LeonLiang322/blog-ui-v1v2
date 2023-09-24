@@ -211,7 +211,7 @@ const handleDelete = async () => {
           v-model="newJournal"
           :loading="uploadLoading"
           :rules="textRules"
-          maxlength="20"
+          maxlength="100"
           counter
           density="comfortable"
           prepend-icon="mdi-comment"
