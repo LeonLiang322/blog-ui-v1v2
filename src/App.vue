@@ -1,18 +1,21 @@
 <template>
   <div id="app">
-    <router-view />
+    <router-view v-if="isRouterAlive"/>
     <Snackbar/>
   </div>
 </template>
 
-<script>
+<script setup>
 import Snackbar from "@/components/Snackbar.vue";
-export default {
-  name: 'App',
-  components: {
-    Snackbar,
-  }
+import {nextTick, provide, ref} from "vue";
+const isRouterAlive = ref(true);
+const reload = () => {
+  isRouterAlive.value = false;
+  nextTick(() => {
+    isRouterAlive.value = true;
+  });
 }
+provide('reload', reload);
 </script>
 
 <style>
@@ -34,5 +37,34 @@ export default {
 /* 鼠标悬停在滚动条上时的滑块样式 */
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+.rainbow-font {
+  animation: rainbow 3s alternate infinite forwards;
+}
+.rainbow-font-reverse {
+  animation: rainbow-reverse 3s alternate infinite forwards;
+  animation-delay: 1s;
+}
+@keyframes rainbow {
+  0% {
+    color: #64FFDA;
+  }
+  50% {
+    color: #FFF;
+  }
+  100% {
+    color: #FED504;
+  }
+}
+@keyframes rainbow-reverse {
+  0% {
+    color: #FED504;
+  }
+  50% {
+    color: #FFF;
+  }
+  100% {
+    color: #64FFDA;
+  }
 }
 </style>

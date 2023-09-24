@@ -1,6 +1,7 @@
 import axios from "axios";
 import store from "@/store";
 import router from "@/router";
+import jwtDecode from "jwt-decode";
 
 const sysInstance = axios.create({
   baseURL: process.env.VUE_APP_BASE_API,
@@ -10,7 +11,7 @@ const sysInstance = axios.create({
 sysInstance.interceptors.request.use(
   (config) => {
     // 在发送请求之前可以做一些处理，如添加公共请求头、处理请求参数等
-    config.headers.Authorization = '123';
+    config.headers.Authorization = localStorage.getItem('token');
     // console.log('发送请求:', config);
     return config;
   },
@@ -69,7 +70,10 @@ const picInstance = axios.create({
 // 请求拦截器
 picInstance.interceptors.request.use(
   (config) => {
-    config.headers.Authorization = 'Bearer 2|Ja2NyZ3EVv7jR7LyHhY33RwYAUwwJUxS83UpJi3R';
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = jwtDecode(token)?.picToken;
+    }
     return config;
   },
   (error) => {

@@ -7,7 +7,9 @@ import vuetify from "@/plugins/vuetify";
 import { setGlobalOptions } from 'vue-request';
 import './assets/scss/main.scss'
 import 'viewerjs/dist/viewer.css'
-import VueViewer from 'v-viewer'
+import viewer from 'v-viewer'
+import VueParticles from "vue-particles";
+import jwtDecode from "jwt-decode";
 
 setGlobalOptions({
   manual: true,
@@ -20,14 +22,50 @@ createApp(App)
   .use(router)
   .use(store)
   .use(vuetify)
-  .use(VueViewer)
+  .use(VueParticles)
+  .use(viewer)
   .mount('#app')
 
 router.beforeEach((to, from, next) => {
-  // window.document.title = '加载中ᓚᘏᗢ';
   to.meta.title && (document.title = to.meta.title);
   window.scrollTo(0, 0);
-  next();
+  if (from.path.startsWith('/admin')) {
+    next();
+    return;
+  }
+  if (to.path.startsWith('/admin')) {
+
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decoded = jwtDecode(token);
+      if (!decoded.admin) {
+        store.dispatch('snackbar/openSnackbar', {
+          msg: '无访问权限',
+          type: 'warning'
+        }).then(() => {
+          next(from.path);
+        });
+      } else {
+        store.dispatch('snackbar/openSnackbar', {
+          msg: '管理员验证成功',
+          type: 'success'
+        }).then(() => {
+          if (!from.path.startsWith('admin')) sessionStorage.setItem('router_from', from.path);
+          next();
+        });
+      }
+    } else {
+      store.dispatch('snackbar/openSnackbar', {
+        msg: '未登录用户',
+        type: 'warning'
+      }).then(() => {
+        next(from.path);
+      });
+    }
+  } else {
+    next()
+  }
+
 })
 
 const debounce = (fn, delay) => {

@@ -14,7 +14,6 @@ import AdminJournals from "@/views/admin/Journals.vue"
 import AdminTags from "@/views/admin/Tags.vue"
 import AdminVersions from "@/views/admin/Versions.vue"
 
-
 const routes = [
   {
     path: '/',
@@ -24,11 +23,7 @@ const routes = [
     path: '/admin',
     redirect: '/admin/articles'
   },
-  // {
-  //   path: '/home',
-  //   name: 'Home',
-  //   component: Home,
-  // },
+
 
   {
     path: '/layout',
@@ -60,7 +55,10 @@ const routes = [
         }
       },{
         path: '/board',
-        component: Board
+        component: Board,
+        meta: {
+          title: '留言板'
+        }
       },{
         path: '/error',
         component: Error,

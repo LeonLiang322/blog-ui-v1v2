@@ -12,7 +12,7 @@ onMounted(() => {
       color="error"
       icon="mdi-lightbulb-alert-outline"
       density="compact">
-    服务器似乎挂掉了呢~改天再来吧！
+    服务器似乎挂掉了!! 改天再来吧~
   </v-alert>
 </div>
 </template>

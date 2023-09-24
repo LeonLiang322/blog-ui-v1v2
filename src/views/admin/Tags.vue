@@ -3,6 +3,7 @@ import req from "@/utils/handleReq";
 import {usePagination, useRequest} from "vue-request";
 import store from "@/store";
 import {ref} from "vue";
+import {JSEncrypt} from "jsencrypt";
 
 const size = 10;
 const getTagsService = async () => {
@@ -233,7 +234,7 @@ const handleDelete = async () => {
         </v-card-text>
       </v-card>
     </v-dialog>
-    <v-form class="mt-4" ref="addForm" validate-on="input lazy" @submit.prevent>
+    <v-form class="mt-4" ref="addForm" validate-on="input lazy" fast-fail @submit.prevent>
       <v-text-field
           v-model="newTag"
           :loading="uploadLoading"
@@ -271,7 +272,7 @@ const handleDelete = async () => {
                   <v-container class="pa-0">
                     <v-row no-gutters align="baseline">
                       <v-col :cols="isSelected ? '12' : 'auto'">
-                        <v-form v-if="isSelected" ref="editForm" validate-on="input lazy" @submit.prevent>
+                        <v-form v-if="isSelected" ref="editForm" validate-on="input lazy" fast-fail @submit.prevent>
                           <v-text-field
                               v-model="tagInput"
                               class="mt-1"

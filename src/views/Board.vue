@@ -8,14 +8,12 @@ onMounted(() => {
 </script>
 
 <template>
-<div>
-  <v-sheet
-      class="w-100 pa-6 my-4"
-      :elevation="4"
-      border
-      rounded>
+<div style="height: 100vh">
+  <div
+      class="w-100 h-100 pa-6 my-4 bg-black"
+      >
 
-  </v-sheet>
+  </div>
 </div>
 </template>
 

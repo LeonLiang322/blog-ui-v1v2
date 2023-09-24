@@ -206,7 +206,7 @@ const handleDelete = async () => {
         </v-card-text>
       </v-card>
     </v-dialog>
-    <v-form class="mt-4" ref="addForm" validate-on="input lazy" @submit.prevent>
+    <v-form class="mt-4" ref="addForm" validate-on="input lazy" fast-fail @submit.prevent>
       <v-text-field
           v-model="newJournal"
           :loading="uploadLoading"
@@ -264,7 +264,7 @@ const handleDelete = async () => {
                   </v-container>
                 </v-card-title>
                 <v-card-text class="pt-1">
-                  <v-form v-if="isSelected" ref="editForm" validate-on="input lazy" @submit.prevent>
+                  <v-form v-if="isSelected" ref="editForm" validate-on="input lazy" fast-fail @submit.prevent>
                     <v-textarea
                         v-model="journalInput"
                         :rules="textRules"

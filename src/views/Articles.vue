@@ -52,7 +52,7 @@ const { runAsync: clickRun } = useRequest(clickArticleService, {
 const jump = async (id) => {
   loading.value = true;
   await clickRun(id);
-  await router.push({path: '/article', query: {id: id}});
+  await router.push({path: '/article', query: { id: id }});
 }
 
 </script>

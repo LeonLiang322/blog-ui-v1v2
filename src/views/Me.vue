@@ -53,7 +53,7 @@ const {
   },
   onSuccess: () => {
     setTimeout(() => {
-      panel.value = [2];
+      panel.value = [1, 2];
     }, 200)
   }
 });
@@ -71,12 +71,18 @@ const jump = (path, query) => {
 
 <template>
   <div>
-    <v-sheet class="mb-4 pt-4 pb-6 rounded text-center ls-3">
-      <div class="greeting text-h5 my-2">Hiiya~</div>
-      <div class="text-h4 d-inline">这里是Leon Liang </div>
-      <span>( ′ 3`)</span>
-    </v-sheet>
-    <v-divider class="my-4"></v-divider>
+    <div class="box mb-4 pt-4 pb-6 rounded text-center overflow-hidden">
+      <div class="lean-box d-flex">
+        <div class="wrapper">
+          <div class="icon-pair " v-for="i in 8" :key="i">
+            <div class="icon rainbow-font">Hello~</div>
+            <div class="icon rainbow-font-reverse">(｡･∀･)ﾉﾞ</div>
+            <div class="icon rainbow-font">Hello~</div>
+            <div class="icon rainbow-font-reverse">(｡･∀･)ﾉﾞ</div>
+          </div>
+        </div>
+      </div>
+    </div>
     <v-expansion-panels
         v-model="panel"
         :multiple="true"
@@ -130,7 +136,9 @@ const jump = (path, query) => {
                     <v-chip-group class="pa-0 justify-end">
                       <v-chip target="_blank" href="https://vuejs.org/">Vue 3</v-chip>
                       <v-chip target="_blank" href="https://vuetifyjs.com/">Vuetify UI</v-chip>
-                      <v-chip target="_blank" href="https://www.antdv.com/">Ant Design UI</v-chip>
+                      <v-chip class="text-decoration-line-through" target="_blank" href="https://www.antdv.com/">
+                        Ant Design UI
+                      </v-chip>
                     </v-chip-group>
                   </td>
                 </tr>
@@ -261,9 +269,40 @@ const jump = (path, query) => {
 </template>
 
 <style scoped>
-.greeting {
-  animation: rainbow 5s alternate infinite forwards;
+.box {
+  height: 200px;
 }
+.icon {
+  letter-spacing: 10px;
+  width: 300px;
+  font-size: 55px;
+}
+.lean-box {
+  transform: rotate(-15deg);
+}
+.wrapper {
+  margin-top: -80px;
+  display: flex;
+  flex-wrap: nowrap;
+  animation: row-up 10s linear infinite;
+}
+.wrapper .icon:nth-child(even) {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  transform: translate(-160px);
+}
+.icon-pair {
+  margin-left: 20px;
+}
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+}
+
+
 a {
   cursor: pointer;
 }
@@ -273,15 +312,14 @@ a {
 .v-card-text {
   line-height: 1.5rem;
 }
-@keyframes rainbow {
-  0% {
-    color: #64FFDA;
+@keyframes row-up {
+  from {
+    transform: translateX(0%);
   }
-  50% {
-    color: #FED504;
-  }
-  100% {
-    color: #76FF03;
+
+  to {
+    transform: translateX(-50%);
   }
 }
+
 </style>

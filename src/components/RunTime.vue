@@ -16,7 +16,7 @@ export default defineComponent({
       const hours = Math.floor(minutes / 60);
       const days = Math.floor(hours / 24);
 
-      runningTime.value = `已熬夜 ${days} 天 ${hours % 24} 时 ${minutes % 60} 分 ${seconds % 60} 秒 ~`;
+      runningTime.value = `${days} 天 ${hours % 24} 时 ${minutes % 60} 分 ${seconds % 60} 秒`;
     }
 
     onMounted(() => {
@@ -35,7 +35,17 @@ export default defineComponent({
 </script>
 
 <template>
-  <span><v-icon color="green" icon="mdi-clock-time-eleven-outline" size="15" class="mr-1" />{{ runningTime }}</span>
+  <div class="text-center">
+    <p class="mb-2">
+      <v-icon class="pr-2" color="primary" icon="" size="x-small">
+        mdi-clock-time-eleven-outline
+      </v-icon>
+      <span>已坚持熬夜</span>
+    </p>
+    <p>{{ runningTime }}</p>
+  </div>
+
+
 </template>
 
 <style scoped>

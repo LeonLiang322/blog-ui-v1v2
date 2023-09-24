@@ -128,7 +128,7 @@ const {
 
 // 获取照片PKey
 const {
-  data: pKey,
+  data: pkey,
   runAsync: getPKeyRun,
   loading: getPKeyLoading
 } = useRequest(getPKeyService, {
@@ -201,8 +201,8 @@ const handleUploadSubmit = async () => {
       const formData = new FormData();
       formData.append('file', pFile.value[0]);
       await uploadImgRun(formData);
-      data.url = imgUploaded.value?.links?.url;
-      data.pKey = imgUploaded.value?.key;
+      data.url = imgUploaded.value.links.url;
+      data.pkey = imgUploaded.value.key;
       loadingDialog.value.text = '正在上传照片...'
       await uploadPhotoRun(data);
       await store.dispatch('snackbar/openSnackbar', {
@@ -244,7 +244,7 @@ const onDelete = async v => {
   await getPKeyRun(v.id);
   deletePhoto.value.id = v.id;
   deletePhoto.value.title = v.title;
-  deletePhoto.value.pKey = pKey.value;
+  deletePhoto.value.pkey = pkey.value;
   deleteDialog.value = true;
 }
 
@@ -262,7 +262,7 @@ const handleDelete = async () => {
   await deleteRun(deletePhoto.value.id);
   if (pDeleted) {
     loadingDialog.value.text = '正在删除图床图片...'
-    await deleteImgRun(deletePhoto.value.pKey);
+    await deleteImgRun(deletePhoto.value.pkey);
   }
   await store.dispatch('snackbar/openSnackbar', {
     msg: pDeleted.value ? '照片删除成功': '照片删除失败',
@@ -349,15 +349,14 @@ onMounted(() => {
         <v-card-text>
           <v-card class="w-100 mx-auto mt-2 bg-transparent" max-width="800">
             <v-card-text class="overflow-auto">
-              <v-form ref="uploadForm" validate-on="input lazy" @submit.prevent>
+              <v-form ref="uploadForm" validate-on="input lazy" fast-fail @submit.prevent>
                 <v-text-field
                     v-model="title"
                     maxlength="20"
                     counter
                     :rules="titleRules"
                     label="标题"
-                    clearable
-                    :autofocus="!editId"/>
+                    clearable />
                 <v-textarea
                     v-model="content"
                     maxlength="100"
@@ -414,29 +413,40 @@ onMounted(() => {
                       class="align-center justify-center"
                       :model-value="isHovering"
                       contained>
-                    <v-btn
-                        color="blue"
-                        size="large"
-                        @click="api({ images: [photo.url] })">
-                      <v-icon size="large">mdi-magnify</v-icon>
-                    </v-btn>
-                    <v-btn
-                        class="ml-8"
-                        :disabled="getPKeyLoading"
-                        :loading="getPhotoLoading"
-                        size="large"
-                        @click="handleEdit(photo.id)">
-                      <v-icon size="large">mdi-pencil-outline</v-icon>
-                    </v-btn>
-                    <v-btn
-                        class="ml-8"
-                        :disabled="getPhotoLoading"
-                        :loading="getPKeyLoading"
-                        color="error"
-                        size="large"
-                        @click="onDelete(photo)">
-                      <v-icon size="large">mdi-trash-can-outline</v-icon>
-                    </v-btn>
+                    <v-container>
+                      <v-row class="text-center" justify="center">
+                        <v-col cols="12" sm="4">
+                          <v-btn
+                              color="blue"
+                              size="large"
+                              @click="api({ images: [photo.url] })">
+                            <v-icon size="large">mdi-magnify</v-icon>
+                          </v-btn>
+                        </v-col>
+                        <v-col cols="12" sm="4">
+                          <v-btn
+                              :disabled="getPKeyLoading"
+                              :loading="getPhotoLoading"
+                              size="large"
+                              @click="handleEdit(photo.id)">
+                            <v-icon size="large">mdi-pencil-outline</v-icon>
+                          </v-btn>
+                        </v-col>
+                        <v-col cols="12" sm="4">
+                          <v-btn
+                              :disabled="getPhotoLoading"
+                              :loading="getPKeyLoading"
+                              color="error"
+                              size="large"
+                              @click="onDelete(photo)">
+                            <v-icon size="large">mdi-trash-can-outline</v-icon>
+                          </v-btn>
+                        </v-col>
+                      </v-row>
+                    </v-container>
+
+
+
                   </v-overlay>
 
                 </div>

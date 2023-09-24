@@ -40,7 +40,7 @@ const getArticleService = async id => {
   return result.data.data;
 }
 const deleteArticleService = async id => {
-  const result = req.sys.delete('/articles/' + id);
+  const result = await req.sys.delete('/articles/' + id);
   return result.data.data;
 }
 const getArticleTKeyService = async id => {
@@ -153,7 +153,7 @@ const {
 
 // 获取文章TKey
 const {
-  data: tKey,
+  data: tkey,
   runAsync: getTKeyRun,
   loading: getTKeyLoading
 } = useRequest(getArticleTKeyService, {
@@ -279,12 +279,12 @@ const handleUploadSubmit = async () => {
       // 如果需要更新封面图
       if (thumbnail.value) {
         // 当存在旧封面图时执行删除
-        if (tKey.value) {
+        if (tkey.value) {
           loadingDialog.value.text = '正在删除旧封面...';
-          await deleteImgRun(tKey.value)
+          await deleteImgRun(tkey.value)
         }
         // 若不存在旧封面图 或 旧封面图已删除
-        if (tKey.value === null || tDeleted.value) {
+        if (tkey.value === null || tDeleted.value) {
           loadingDialog.value.text = '正在上传封面...'
           const formData = new FormData();
           formData.append('file', thumbnail.value[0]);
@@ -292,7 +292,7 @@ const handleUploadSubmit = async () => {
           await uploadImgRun(formData);
           // 表单数据添加封面信息
           data.thumbnail = tUploaded.value?.links?.url;
-          data.tKey = tUploaded.value?.key;
+          data.tkey = tUploaded.value?.key;
         } else {
           loadingDialog.value.text = '封面替换失败';
         }
@@ -315,7 +315,7 @@ const handleUploadSubmit = async () => {
         await uploadImgRun(formData);
         // 表单数据添加封面信息
         data.thumbnail = tUploaded.value?.links?.url;
-        data.tKey = tUploaded.value?.key;
+        data.tkey = tUploaded.value?.key;
       }
       data.content = html.value;
       data.tagIds = tagIds.value;
@@ -350,7 +350,7 @@ const handleEdit = async id => {
   tagIds.value.push(...v.tags.map(tag => tag.id));
   thumbnailUrl.value = v.thumbnail;
   html.value = v.content;
-  tKey.value = v.tKey;
+  tkey.value = v.tkey;
   editId.value = id;
   dialog.value = true;
 }
@@ -362,7 +362,7 @@ const onDelete = async v => {
   await getTKeyRun(v.id);
   deleteArticle.value.id = v.id;
   deleteArticle.value.title = v.title;
-  deleteArticle.value.tKey = tKey.value;
+  deleteArticle.value.tkey = tkey.value;
   deleteDialog.value = true;
 }
 
@@ -378,9 +378,10 @@ const handleDelete = async () => {
   loadingDialog.value.visible = true;
   loadingDialog.value.text = '正在删除文章...'
   await deleteRun(deleteArticle.value.id);
-  if (aDeleted && deleteArticle.value?.tKey) {
+  console.log(aDeleted)
+  if (aDeleted.value && deleteArticle.value?.tkey) {
     loadingDialog.value.text = '正在删除封面...'
-    await deleteImgRun(deleteArticle.value.tKey);
+    await deleteImgRun(deleteArticle.value.tkey);
   }
   await store.dispatch('snackbar/openSnackbar', {
     msg: aDeleted.value ? '文章删除成功': '文章删除失败',
@@ -473,7 +474,7 @@ onMounted(() => {
           <v-card-text class="overflow-auto">
             <v-window v-model="tab">
               <v-window-item value="edit">
-                <v-form ref="uploadForm" validate-on="input lazy" @submit.prevent>
+                <v-form ref="uploadForm" validate-on="input lazy" fast-fail @submit.prevent>
                   <v-text-field
                       v-model="title"
                       maxlength="20"
@@ -481,8 +482,7 @@ onMounted(() => {
                       :rules="titleRules"
                       :loading="titleExistLoading"
                       label="标题"
-                      clearable
-                      :autofocus="!editId"/>
+                      clearable />
                   <v-text-field
                       v-model="subtitle"
                       maxlength="40"

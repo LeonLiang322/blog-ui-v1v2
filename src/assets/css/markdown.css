@@ -1,4 +1,5 @@
 .markdown-body {
+  letter-spacing: 1px;
   font-family: 'SmileySans', sans-serif;
   background-color: transparent;
 }
@@ -29,6 +30,14 @@
 
 .markdown-body a {
   color: #FED504;
+}
+
+.markdown-body pre {
+  background: #2f323a;
+}
+
+.markdown-body pre button {
+   visibility: hidden;
 }
 
 

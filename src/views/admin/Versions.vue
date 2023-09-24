@@ -271,7 +271,7 @@ const handleDelete = async () => {
             </v-menu>
 
           </template>
-          <v-form class="mt-n1" ref="addForm" validate-on="input lazy" @submit.prevent>
+          <v-form class="mt-n1" ref="addForm" validate-on="input lazy" fast-fail @submit.prevent>
             <v-radio-group
                 v-model="newVer"
                 :rules="[v => !!v || '未选择版本号']"
@@ -347,7 +347,7 @@ const handleDelete = async () => {
                 </v-container>
               </v-card-title>
               <v-card-text class="pt-1">
-                <v-form v-if="isSelected" ref="editForm" validate-on="input lazy" @submit.prevent>
+                <v-form v-if="isSelected" ref="editForm" validate-on="input lazy" fast-fail @submit.prevent>
                   <v-textarea
                       v-model="versionInput"
                       :rules="textRules"
