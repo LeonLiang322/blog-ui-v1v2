@@ -352,7 +352,7 @@ onMounted(() => {
               <v-form ref="uploadForm" validate-on="input lazy" fast-fail @submit.prevent>
                 <v-text-field
                     v-model="title"
-                    maxlength="20"
+                    maxlength="40"
                     counter
                     :rules="titleRules"
                     label="标题"

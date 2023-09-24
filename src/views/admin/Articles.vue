@@ -182,7 +182,7 @@ const thumbnail = ref();
 const thumbnailUrl = ref();
 const titleRules = [
   v => !!v || '标题不可为空',
-  v => (v && v.length <= 20) || '标题不可超过20字',
+  v => (v && v.length <= 100) || '标题不可超过100字',
   v => handleTitleInput(v),
 ];
 const tagRules = [
@@ -477,7 +477,7 @@ onMounted(() => {
                 <v-form ref="uploadForm" validate-on="input lazy" fast-fail @submit.prevent>
                   <v-text-field
                       v-model="title"
-                      maxlength="20"
+                      maxlength="100"
                       counter
                       :rules="titleRules"
                       :loading="titleExistLoading"
@@ -485,9 +485,9 @@ onMounted(() => {
                       clearable />
                   <v-text-field
                       v-model="subtitle"
-                      maxlength="40"
+                      maxlength="60"
                       counter
-                      :rules="[v => (!v || v.length <= 40) || '副标题不可超过40字']"
+                      :rules="[v => (!v || v.length <= 40) || '副标题不可超过60字']"
                       label="副标题"
                       clearable />
                   <v-combobox
