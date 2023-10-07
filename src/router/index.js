@@ -63,7 +63,7 @@ const routes = [
         path: '/error',
         component: Error,
         meta: {
-          title: '出错了哎(⌐■_■)'
+          title: '出错了(⌐■_■)'
         }
       }
     ]
@@ -75,19 +75,34 @@ const routes = [
     children: [
       {
         path: '/admin/articles',
-        component: AdminArticles
+        component: AdminArticles,
+        meta: {
+          title: '管理 | 文章'
+        }
       }, {
         path: '/admin/photos',
-        component: AdminPhotos
+        component: AdminPhotos,
+        meta: {
+          title: '管理 | 照片'
+        }
       }, {
         path: '/admin/journals',
-        component: AdminJournals
+        component: AdminJournals,
+        meta: {
+          title: '管理 | 动态'
+        }
       }, {
         path: '/admin/tags',
-        component: AdminTags
+        component: AdminTags,
+        meta: {
+          title: '管理 | 标签'
+        }
       }, {
         path: '/admin/versions',
-        component: AdminVersions
+        component: AdminVersions,
+        meta: {
+          title: '管理 | 版本'
+        }
       }
     ]
   }

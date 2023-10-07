@@ -1,7 +1,7 @@
 <script setup>
 import {onMounted, ref} from "vue";
 import {usePagination, useRequest} from "vue-request";
-import req from "@/utils/handleReq";
+import req from "@/utils/RequestUtil";
 import store from "@/store";
 import {api} from "v-viewer";
 
@@ -281,10 +281,6 @@ const handleDelete = async () => {
   if (photos.value.records.length <= 1) current.value--;
   changeCurrent(current.value);
 }
-
-onMounted(() => {
-  document.title = "管理 | 照片"
-})
 </script>
 
 <template>

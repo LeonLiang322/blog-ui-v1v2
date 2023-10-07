@@ -1,5 +1,5 @@
 <script setup>
-import req from "@/utils/handleReq";
+import req from "@/utils/RequestUtil";
 import {usePagination, useRequest} from "vue-request";
 import store from "@/store";
 import {ref} from "vue";

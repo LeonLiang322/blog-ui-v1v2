@@ -4,7 +4,7 @@ import moonSvg from '@/assets/moon.svg'
 import Bubbles from "@/components/Bubbles.vue";
 import Steps from "@/components/Steps.vue";
 import RunTime from "@/components/RunTime.vue";
-import req from "@/utils/handleReq";
+import req from "@/utils/RequestUtil";
 import store from "@/store";
 import {useRequest} from "vue-request";
 import {onBeforeRouteLeave} from "vue-router";

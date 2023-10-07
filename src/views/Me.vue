@@ -1,5 +1,5 @@
 <script setup>
-import req from "@/utils/handleReq";
+import req from "@/utils/RequestUtil";
 import { useLoadMore } from "vue-request";
 import { inject, ref, watch } from "vue";
 import router from "@/router";

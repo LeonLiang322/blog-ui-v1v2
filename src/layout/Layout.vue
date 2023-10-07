@@ -2,7 +2,7 @@
 import {inject, nextTick, onBeforeUnmount, onMounted, provide, ref} from "vue";
 import RunTime from "@/components/RunTime.vue";
 import {useRequest} from "vue-request";
-import req from "@/utils/handleReq";
+import req from "@/utils/RequestUtil";
 import store from "@/store";
 import router from "@/router";
 import bar from "@/assets/images/bar.png";
@@ -18,7 +18,7 @@ const getKeyService = async () => {
 
 const loginService = async v => {
   const result = await req.sys.post('/users/login', v);
-  return result.data.data;
+  return result.data;
 }
 
 const logoutService = async v => {
@@ -156,23 +156,22 @@ const onLogin = async () => {
       encryptor.setPublicKey(publicKey.value);
       const data = { mail: mail.value, password: encryptor.encrypt(password.value) };
       await loginRun(data);
-      if (token.value) {
-        localStorage.setItem('token', token.value);
+      if (token.value.data) {
+        localStorage.setItem('token', token.value.data);
         await store.dispatch('snackbar/openSnackbar', {
           msg: '登录成功',
           type: 'success'
         });
-        loginLoading.value = false;
         reload();
-        return;
+      } else {
+        await store.dispatch('snackbar/openSnackbar', {
+          msg: token.value.msg,
+          type: 'warning'
+        });
       }
     }
   }
   loginLoading.value = false;
-  await store.dispatch('snackbar/openSnackbar', {
-    msg: '登录失败',
-    type: 'error'
-  });
 }
 
 const profile = ref(false);
@@ -185,6 +184,7 @@ const logout = async () => {
         msg: '注销成功',
         type: 'success'
       });
+      reload();
       localStorage.removeItem('token');
     } else {
       await store.dispatch('snackbar/openSnackbar', {
@@ -193,13 +193,20 @@ const logout = async () => {
       });
     }
   }
-  reload();
 }
 
 const handleSearch = () => {
   store.dispatch('snackbar/openSnackbar', {
     msg: '搜索功能还未开放~（那你放这里干啥?！）',
   });
+}
+
+const truncatedText = (text) => {
+  if (text.length > 4) {
+    return text.slice(0, 4) + "…";
+  } else {
+    return text;
+  }
 }
 
 onMounted(() => {
@@ -279,7 +286,7 @@ onBeforeUnmount(() => {
                 color="surface"
                 variant="text"
                 prepend-icon="mdi-card-account-details-outline">
-              <p class="font-weight-bold">{{ userInfo.name }}</p>
+              <p class="font-weight-bold ls-1">{{ truncatedText(userInfo.name) }}</p>
             </v-btn>
           </template>
           <v-card

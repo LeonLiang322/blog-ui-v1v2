@@ -1,6 +1,7 @@
 <script setup>
-import {onBeforeUnmount, onMounted, provide, ref} from "vue";
+import {inject, onBeforeUnmount, onMounted, provide, ref} from "vue";
 import router from "@/router";
+import {keepAlive} from "@/utils/UserUtil";
 
 const links = [
   {

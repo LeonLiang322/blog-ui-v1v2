@@ -1,7 +1,7 @@
 <script setup>
 import {inject, ref, watch} from 'vue';
 import {useRequest} from 'vue-request';
-import req from '@/utils/handleReq';
+import req from '@/utils/RequestUtil';
 import {useRoute} from 'vue-router';
 import 'github-markdown-css/github-markdown-dark.css'
 import '/src/assets/css/markdown.css'

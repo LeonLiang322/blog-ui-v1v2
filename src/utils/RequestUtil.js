@@ -16,7 +16,7 @@ sysInstance.interceptors.request.use(
     return config;
   },
   (error) => {
-    router.push('/error').then(r => {
+    router.push('/error').then(() => {
       store.dispatch('snackbar/openSnackbar', {
         msg: error,
         color: 'error',
@@ -31,11 +31,18 @@ sysInstance.interceptors.request.use(
 sysInstance.interceptors.response.use(
   (response) => {
     // 在收到响应后可以做一些处理，如统一处理错误状态码、处理响应数据等
-    // console.log('收到响应:', response);
+    if (response.data.code === "500") {
+      router.push({path: '/article', query: { msg: response.data.msg }}).then(() => {
+        store.dispatch('snackbar/openSnackbar', {
+          msg: response.data.msg,
+          color: 'error',
+        }).then();
+      });
+    }
     return response;
   },
   (error) => {
-    router.push('/error').then(r => {
+    router.push('/error').then(() => {
       store.dispatch('snackbar/openSnackbar', {
         msg: error,
         color: 'error',

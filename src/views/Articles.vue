@@ -1,10 +1,10 @@
 <script setup>
-import req from "@/utils/handleReq";
+import req from "@/utils/RequestUtil";
 import { usePagination, useRequest } from "vue-request";
 import { inject, watch } from "vue";
 import router from "@/router";
 import bg from "@/assets/images/article-bg.jpg"
-import {formatDate} from "../utils/DateUtil";
+import {formatDate} from "@/utils/DateUtil";
 
 const clickArticleService = async (id) => {
   return await req.sys.patch('/articles/click/' + id);

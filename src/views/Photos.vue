@@ -1,5 +1,5 @@
 <script setup>
-import req from "@/utils/handleReq";
+import req from "@/utils/RequestUtil";
 import { usePagination } from "vue-request";
 import { inject, onBeforeUnmount, onMounted, ref, watch } from "vue";
 

@@ -1,9 +1,8 @@
 <script setup>
-import { onMounted } from 'vue'
+import { useRoute } from "vue-router";
 
-onMounted(() => {
-  document.title = "出错啦！！(⌐■_■)"
-});
+const msg = useRoute().query.msg;
+
 </script>
 
 <template>
@@ -12,7 +11,10 @@ onMounted(() => {
       color="error"
       icon="mdi-lightbulb-alert-outline"
       density="compact">
-    服务器似乎挂掉了!! 改天再来吧~
+    <p class="text-h6">服务器似乎出现了点问题~请稍后再试</p>
+    <p class="mt-2" v-if="msg">
+      错误原因：{{ msg }}
+    </p>
   </v-alert>
 </div>
 </template>

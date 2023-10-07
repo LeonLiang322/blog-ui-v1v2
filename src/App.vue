@@ -1,13 +1,7 @@
-<template>
-  <div id="app">
-    <router-view v-if="isRouterAlive"/>
-    <Snackbar/>
-  </div>
-</template>
-
 <script setup>
 import Snackbar from "@/components/Snackbar.vue";
-import {nextTick, provide, ref} from "vue";
+import {nextTick, onBeforeMount, provide, ref} from "vue";
+import {keepAlive} from "@/utils/UserUtil";
 const isRouterAlive = ref(true);
 const reload = () => {
   isRouterAlive.value = false;
@@ -16,7 +10,17 @@ const reload = () => {
   });
 }
 provide('reload', reload);
+onBeforeMount(() => {
+  keepAlive(reload);
+});
 </script>
+
+<template>
+  <div id="app">
+    <router-view v-if="isRouterAlive"/>
+    <Snackbar/>
+  </div>
+</template>
 
 <style>
 * {

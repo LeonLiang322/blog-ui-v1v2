@@ -1,4 +1,4 @@
-import { createApp } from 'vue'
+import {createApp, inject} from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
@@ -24,7 +24,7 @@ createApp(App)
   .use(vuetify)
   .use(VueParticles)
   .use(viewer)
-  .mount('#app')
+  .mount('#app');
 
 router.beforeEach((to, from, next) => {
   to.meta.title && (document.title = to.meta.title);
@@ -34,7 +34,6 @@ router.beforeEach((to, from, next) => {
     return;
   }
   if (to.path.startsWith('/admin')) {
-
     const token = localStorage.getItem('token');
     if (token) {
       const decoded = jwtDecode(token);
@@ -56,7 +55,7 @@ router.beforeEach((to, from, next) => {
       }
     } else {
       store.dispatch('snackbar/openSnackbar', {
-        msg: '未登录用户',
+        msg: '未登录',
         type: 'warning'
       }).then(() => {
         next(from.path);
