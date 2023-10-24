@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { usePagination, useRequest } from "vue-request";
 import req from "@/utils/RequestUtil";
 import store from "@/store";
@@ -435,7 +435,7 @@ const handleDelete = async () => {
       v-model="loadingDialog.visible"
       persistent
       width="auto">
-    <v-card color="primary">
+    <v-card>
       <v-card-text>
         {{ loadingDialog.text }}
         <v-progress-linear
@@ -585,7 +585,7 @@ const handleDelete = async () => {
                 <v-slide-group-item
                     v-for="tag in article.tags"
                     :key="tag.id">
-                  <v-chip class="ma-1" variant="elevated" rounded>
+                  <v-chip class="ma-1" variant="elevated">
                     {{ tag.name }}
                   </v-chip>
                 </v-slide-group-item>

@@ -18,7 +18,7 @@ const getKeyService = async () => {
 
 const loginService = async v => {
   const result = await req.sys.post('/users/login', v);
-  return result.data;
+  return result.data.data;
 }
 
 const logoutService = async v => {
@@ -146,7 +146,6 @@ const passwordRule = [
 ];
 
 const onLogin = async () => {
-
   const { valid } = await loginForm.value.validate();
   if (valid) {
     loginLoading.value = true;
@@ -156,18 +155,13 @@ const onLogin = async () => {
       encryptor.setPublicKey(publicKey.value);
       const data = { mail: mail.value, password: encryptor.encrypt(password.value) };
       await loginRun(data);
-      if (token.value.data) {
-        localStorage.setItem('token', token.value.data);
+      if (token.value) {
+        localStorage.setItem('token', token.value);
         await store.dispatch('snackbar/openSnackbar', {
           msg: '登录成功',
           type: 'success'
         });
         reload();
-      } else {
-        await store.dispatch('snackbar/openSnackbar', {
-          msg: token.value.msg,
-          type: 'warning'
-        });
       }
     }
   }
@@ -228,7 +222,7 @@ onBeforeUnmount(() => {
     <vue-particles
         color="#FED504"
         :particleOpacity="0.7"
-        :particlesNumber="100"
+        :particlesNumber="60"
         shapeType="circle"
         :particleSize="4"
         linesColor="#03DAC6"
@@ -236,7 +230,7 @@ onBeforeUnmount(() => {
         :lineLinked="true"
         :lineOpacity="0.4"
         :linesDistance="100"
-        :moveSpeed="3"
+        :moveSpeed="2"
         :hoverEffect="true"
         hoverMode="grab"
         :clickEffect="true"
@@ -473,7 +467,7 @@ onBeforeUnmount(() => {
       <v-container class="d-flex justify-center h-100 text-center">
         <v-row>
           <v-col cols="12">
-            <v-avatar class="avatar mx-auto mt-10 elevation-5" size="150" @click="router.push('/me')">
+            <v-avatar class="avatar mx-auto mt-8 elevation-5" size="150" @click="router.push('/me')">
               <v-img src="../assets/images/my-avatar.jpg" alt="my-avatar"/>
             </v-avatar>
             <p class="rainbow-font font-weight-bold mt-4 ls-2" style="font-size: 1.3rem">Leon Liang</p>
@@ -481,7 +475,7 @@ onBeforeUnmount(() => {
           <v-col cols="12"></v-col>
           <v-col cols="12">
             <RunTime />
-            <v-table class="mt-5 ls-1" style="font-size: .9rem">
+            <v-table v-if="$route.path !== '/error'" class="mt-5 ls-1" style="font-size: .9rem">
               <tbody>
               <tr>
                 <td class="d-flex align-center text-primary">
@@ -489,7 +483,7 @@ onBeforeUnmount(() => {
                 </td>
                 <td>
                   <v-progress-circular v-if="dataLoading" indeterminate color="primary" size="20"/>
-                  <p class="rainbow-font" v-else>{{ data.narticle }}</p>
+                  <p v-else>{{ data.narticle }}</p>
                 </td>
               </tr>
               <tr>
@@ -498,7 +492,7 @@ onBeforeUnmount(() => {
                 </td>
                 <td>
                   <v-progress-circular v-if="dataLoading" indeterminate color="primary" size="20"/>
-                  <p class="rainbow-font" v-else>{{ data.nphoto }}</p>
+                  <p v-else>{{ data.nphoto }}</p>
                 </td>
               </tr>
               <tr>
@@ -507,7 +501,7 @@ onBeforeUnmount(() => {
                 </td>
                 <td>
                   <v-progress-circular v-if="dataLoading" indeterminate color="primary" size="20"/>
-                  <p class="rainbow-font" v-else>{{ data.nsentence }}</p>
+                  <p v-else>{{ data.nsentence }}</p>
                 </td>
               </tr>
               <tr>
@@ -516,7 +510,7 @@ onBeforeUnmount(() => {
                 </td>
                 <td>
                   <v-progress-circular v-if="dataLoading" indeterminate color="primary" size="20"/>
-                  <p class="rainbow-font" v-else>{{ data.ntag }}</p>
+                  <p v-else>{{ data.ntag }}</p>
                 </td>
               </tr>
               <tr>
@@ -525,7 +519,7 @@ onBeforeUnmount(() => {
                 </td>
                 <td>
                   <v-progress-circular v-if="dataLoading" indeterminate color="primary" size="20"/>
-                  <p class="rainbow-font" v-else>{{ data.ncomment }}</p>
+                  <p v-else>{{ data.ncomment }}</p>
                 </td>
               </tr>
               </tbody>
@@ -538,13 +532,7 @@ onBeforeUnmount(() => {
     <!--内容主体-->
     <v-main class="d-flex align-center justify-center w-100">
       <v-container class="px-6">
-        <!--<router-view class="main" />-->
-        <router-view class="main" v-slot="{ Component }">
-          <keep-alive>
-            <component :is="Component" />
-          </keep-alive>
-        </router-view>
-
+        <router-view class="main" />
       </v-container>
     </v-main>
 
@@ -562,14 +550,14 @@ onBeforeUnmount(() => {
       width="auto">
     <v-card class="pa-2">
       <v-card-title class="text-primary">
-        (＾Ｕ＾)ノ~ＹＯ
+        (＾U＾)ノ~ H i
       </v-card-title>
       <v-card-text class="note">
         <p>欢迎来到我的博客~</p>
-        <p>2023年9月24日 - 懒得要死的我竟然真把整个系统重构了！！！正式进入2.0版本哈哈！</p>
-        <p>页面稍稍做了一点优化，但目前很多功能仍在随性开发中...主要还是课业会比较忙，有空一定会继续上新！</p>
-        <p>先随便逛逛咯！Take your time！</p>
-        <p>(￣y▽,￣)╭ </p>
+        <p>这是我平时写文章、笔记，发点照片和动态的地方，会坚持更新的。</p>
+        <p>网页比较粗糙，仍在开发中...不过最近挺忙的，新功能只能等我闲下来再慢慢加。</p>
+        <p>因为服务器带宽不够，所以图片的加载也会比较慢，见谅见谅~</p>
+        <p>先随便逛逛呗 -.-</p>
       </v-card-text>
       <v-card-actions>
         <v-checkbox
@@ -614,7 +602,7 @@ onBeforeUnmount(() => {
   transform: rotate(-45deg);
 }
 .footer {
-  font-size: .5rem;
+  font-size: .7rem;
 }
 .footer a {
   text-decoration: none;
@@ -632,13 +620,4 @@ onBeforeUnmount(() => {
 .note p {
   margin-bottom: .5rem;
 }
-//.login::before {
-//  content: "";
-//  position: absolute;
-//  top: 0;
-//  left: 0;
-//  width: 100%;
-//  height: 100%;
-//  background-color: #ffffff20;
-//}
 </style>

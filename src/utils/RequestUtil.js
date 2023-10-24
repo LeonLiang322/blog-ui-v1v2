@@ -19,7 +19,7 @@ sysInstance.interceptors.request.use(
     router.push('/error').then(() => {
       store.dispatch('snackbar/openSnackbar', {
         msg: error,
-        color: 'error',
+        type: 'error',
       }).then();
     });
 
@@ -32,22 +32,20 @@ sysInstance.interceptors.response.use(
   (response) => {
     // 在收到响应后可以做一些处理，如统一处理错误状态码、处理响应数据等
     if (response.data.code === "500") {
-      router.push({path: '/article', query: { msg: response.data.msg }}).then(() => {
-        store.dispatch('snackbar/openSnackbar', {
-          msg: response.data.msg,
-          color: 'error',
-        }).then();
-      });
+      router.push({path: '/error', query: { msg: response.data.msg }}).then();
+      return response;
+    }
+    if (response.data.code === "404") {
+      store.dispatch('snackbar/openSnackbar', {
+        msg: response.data.msg,
+        type: 'warning',
+      }).then();
+      return response;
     }
     return response;
   },
   (error) => {
-    router.push('/error').then(() => {
-      store.dispatch('snackbar/openSnackbar', {
-        msg: error,
-        color: 'error',
-      }).then();
-    });
+    router.push({path: '/error', query: { msg: error }}).then();
     return Promise.reject(error);
   }
 );
@@ -70,6 +68,9 @@ sysMethods.forEach((method) => {
   }
 });
 
+
+
+// ***************** 图床 ***************** //
 const picInstance = axios.create({
   baseURL: 'https://img.stayuplate.icu/api/v1',
 });
@@ -86,7 +87,7 @@ picInstance.interceptors.request.use(
   (error) => {
     store.dispatch('snackbar/openSnackbar', {
       msg: error,
-      color: 'error',
+      type: 'error',
     }).then();
     return Promise.reject(error);
   }
@@ -95,12 +96,18 @@ picInstance.interceptors.request.use(
 // 响应拦截器
 picInstance.interceptors.response.use(
   (response) => {
+    if (!response.data.status) {
+      store.dispatch('snackbar/openSnackbar', {
+        msg: response.data.message,
+        type: 'error',
+      }).then(response.data.data = null);
+    }
     return response;
   },
   (error) => {
     store.dispatch('snackbar/openSnackbar', {
       msg: error,
-      color: 'error',
+      type: 'error',
     }).then();
     return Promise.reject(error);
   }

@@ -106,17 +106,17 @@ onBeforeUnmount(() => {
                     </template>
                     <v-card-title class="text-white" v-text="photo.title" />
                   </v-img>
-                  <v-card-text class="mb-n4 mt-n1" style="font-size: large">
+                  <v-card-text class="mt-n1" style="font-size: large">
                     <p style="font-size: 14px">{{ photo.content ? photo.content : '-'}}</p>
-                    <p class="text-grey mt-1 mb-n2" style="font-size: 11px">{{ photo.date }}</p>
+                    <p class="text-grey mt-1" style="font-size: 11px">{{ photo.date }}</p>
                   </v-card-text>
 
-                  <v-card-actions class="d-flex pl-0">
-                    <v-spacer></v-spacer>
-                    <!--<v-btn size="small" variant="text" icon="mdi-heart"></v-btn>-->
-                    <!--<v-btn size="small" variant="text" icon="mdi-bookmark"></v-btn>-->
-                    <v-btn size="small" variant="text" icon="mdi-comment-quote" @click="toggle"></v-btn>
-                  </v-card-actions>
+                  <!--<v-card-actions class="d-flex pl-0">-->
+                  <!--  <v-spacer></v-spacer>-->
+                  <!--  &lt;!&ndash;<v-btn size="small" variant="text" icon="mdi-heart"></v-btn>&ndash;&gt;-->
+                  <!--  &lt;!&ndash;<v-btn size="small" variant="text" icon="mdi-bookmark"></v-btn>&ndash;&gt;-->
+                  <!--  <v-btn size="small" variant="text" icon="mdi-comment-quote" @click="toggle"></v-btn>-->
+                  <!--</v-card-actions>-->
 
                   <v-expand-transition>
                     <div v-show="isSelected">
@@ -148,7 +148,7 @@ onBeforeUnmount(() => {
         color="primary"
         icon="mdi-hand-okay"
         density="compact">
-      已经在努力加载啦~<span class="ml-4">ᓚᘏᗢ</span>
+      正在努力加载..<span class="ml-4">ᓚᘏᗢ</span>
     </v-alert>
     <div v-else class="text-center mb-4">
       <v-pagination

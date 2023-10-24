@@ -316,7 +316,7 @@ const handleDelete = async () => {
         v-model="loadingDialog.visible"
         persistent
         width="auto">
-      <v-card color="primary">
+      <v-card>
         <v-card-text>
           {{ loadingDialog.text }}
           <v-progress-linear
@@ -411,15 +411,16 @@ const handleDelete = async () => {
                       contained>
                     <v-container>
                       <v-row class="text-center" justify="center">
-                        <v-col cols="12" sm="4">
+                        <v-col cols="12">
                           <v-btn
+                              class="ma-0"
                               color="blue"
                               size="large"
                               @click="api({ images: [photo.url] })">
                             <v-icon size="large">mdi-magnify</v-icon>
                           </v-btn>
                         </v-col>
-                        <v-col cols="12" sm="4">
+                        <v-col cols="12">
                           <v-btn
                               :disabled="getPKeyLoading"
                               :loading="getPhotoLoading"
@@ -428,7 +429,7 @@ const handleDelete = async () => {
                             <v-icon size="large">mdi-pencil-outline</v-icon>
                           </v-btn>
                         </v-col>
-                        <v-col cols="12" sm="4">
+                        <v-col cols="12">
                           <v-btn
                               :disabled="getPhotoLoading"
                               :loading="getPKeyLoading"
@@ -440,11 +441,7 @@ const handleDelete = async () => {
                         </v-col>
                       </v-row>
                     </v-container>
-
-
-
                   </v-overlay>
-
                 </div>
               </div>
             </v-card>

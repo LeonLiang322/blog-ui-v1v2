@@ -26,7 +26,7 @@ export const keepAlive = async (reload) => {
       reload();
       await store.dispatch('snackbar/openSnackbar', {
         msg: token.value.msg,
-        color: 'warning',
+        type: 'warning',
       });
     }
   }

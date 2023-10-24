@@ -33,31 +33,28 @@ const routes = [
         path: '/articles',
         component: Articles,
         meta: {
-          title: '乱写的文章'
+          title: '文章 | Leon的熬夜空间'
         }
       },{
         path: '/article',
         component: Article,
-        meta: {
-          title: '乱写的文章'
-        }
       },{
         path: '/photos',
         component: Photos,
         meta: {
-          title: '瞎拍的照片'
+          title: '照片 | Leon的熬夜空间'
         }
       },{
         path: '/me',
         component: Me,
         meta: {
-          title: '博客与我'
+          title: '博客与我 | Leon的熬夜空间'
         }
       },{
         path: '/board',
         component: Board,
         meta: {
-          title: '留言板'
+          title: '留言板 | Leon的熬夜空间'
         }
       },{
         path: '/error',

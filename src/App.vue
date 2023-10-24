@@ -17,7 +17,11 @@ onBeforeMount(() => {
 
 <template>
   <div id="app">
-    <router-view v-if="isRouterAlive"/>
+    <router-view v-if="isRouterAlive" v-slot="{ Component }">
+      <keep-alive>
+        <component :is="Component" />
+      </keep-alive>
+    </router-view>
     <Snackbar/>
   </div>
 </template>

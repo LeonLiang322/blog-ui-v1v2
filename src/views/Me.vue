@@ -42,7 +42,6 @@ const colors = ['green', 'blue', 'yellow', 'orange', 'red'];
 
 const {
   dataList: sentences,
-  loading: sLoading,
   loadingMore: sLoadingMore,
   noMore: sNoMore,
   loadMore: sLoadMore,
@@ -51,16 +50,16 @@ const {
   isNoMore: (d) => {
     return d?.page === d?.total;
   },
-  onSuccess: () => {
-    setTimeout(() => {
-      panel.value = [1, 2];
-    }, 200)
-  }
 });
 
-const layoutLoading = inject('layoutLoading');
-watch(sLoading, (value) => {
-  layoutLoading.value = value;
+const localPanel = localStorage.getItem('panel');
+if (localPanel) {
+  panel.value = JSON.parse(localPanel);
+} else {
+  panel.value = [0, 1, 2];
+}
+watch(panel, (value) => {
+  localStorage.setItem('panel', JSON.stringify(value));
 });
 
 const jump = (path, query) => {
@@ -116,13 +115,14 @@ const jump = (path, query) => {
               这个博客怎么建的？
             </v-card-title>
             <v-card-text>
-              前后端分离，只用了几个简单的框架（但还是有一堆bug，我大学学了个寂寞？）<br>
-              <span style="text-decoration: line-through">要是以后学了啥更好用的再来重构吧~</span>
-               &lt= 我懒死了咋会做这种事儿
+              从零开始纯手撸的。<br>
+              <span class="text-decoration-line-through mr-1">感觉前端UI框架没选好，以后再来重构吧</span>
+              <span style="text-decoration: line-through">开摆了</span>
+               好吧我还真重构了🤦‍♂️
               <v-table class="mt-5 ls-1 bg-transparent text-no-wrap">
                 <tbody>
                 <tr>
-                  <td>后端随便写写咯</td>
+                  <td>后端</td>
                   <td>
                     <v-chip-group class="pa-0 justify-end">
                       <v-chip target="_blank" href="https://spring.io/">Spring Boot</v-chip>
@@ -131,7 +131,7 @@ const jump = (path, query) => {
                   </td>
                 </tr>
                 <tr>
-                  <td>前端再学了几个</td>
+                  <td>前端</td>
                   <td>
                     <v-chip-group class="pa-0 justify-end">
                       <v-chip target="_blank" href="https://vuejs.org/">Vue 3</v-chip>
@@ -143,11 +143,11 @@ const jump = (path, query) => {
                   </td>
                 </tr>
                 <tr>
-                  <td>数据库捣鼓一下</td>
+                  <td>数据库</td>
                   <td>
                     <v-chip-group class="pa-0 justify-end">
-                      <v-chip target="_blank" href="https://www.mysql.com/">MySQL 8</v-chip>
-                      <v-chip target="_blank" href="https://redis.io/">Redis</v-chip>
+                      <v-chip target="_blank" href="https://www.mysql.com/">MySQL</v-chip>
+                      <v-chip class="text-decoration-line-through" target="_blank" href="https://redis.io/">Redis</v-chip>
                     </v-chip-group>
                   </td>
                 </tr>
@@ -181,7 +181,7 @@ const jump = (path, query) => {
                     icon="mdi-dots-vertical"
                     size="16"
                     fill-dot>
-                  <v-btn class="mt-n2" size="small" :loading="vLoadingMore" @click="vLoadMore">更早版本记录</v-btn>
+                  <v-btn class="mt-n2" size="small" :loading="vLoadingMore" @click="vLoadMore">更早</v-btn>
                 </v-timeline-item>
               </v-timeline>
             </v-card-text>
@@ -224,7 +224,7 @@ const jump = (path, query) => {
           </v-card>
         </v-expansion-panel-text>
       </v-expansion-panel>
-      <v-expansion-panel class="pb-4" key="sentence">
+      <v-expansion-panel key="sentence">
         <v-expansion-panel-title
             class="text-h6"
             color="primary"
@@ -232,10 +232,12 @@ const jump = (path, query) => {
           动态
         </v-expansion-panel-title>
         <v-expansion-panel-text class="pa-0">
+          <v-progress-circular v-if="!sentences" class="mt-2" indeterminate color="primary"/>
           <p v-if="sentences.length === 0" class="my-4">还没有吐槽过呢...</p>
           <v-timeline
               v-else
               class="justify-start mt-2"
+              :class="sNoMore ? 'pb-3' : ''"
               density="compact"
               side="end"
               :truncate-line="sNoMore ? 'both' : 'start'">
@@ -258,8 +260,8 @@ const jump = (path, query) => {
                 dot-color="primary"
                 icon="mdi-emoticon-kiss-outline"
                 fill-dot>
-              <v-btn v-if="!sNoMore" density="comfortable" @click="sLoadMore" :loading="sLoadingMore">加载更多</v-btn>
-              <p v-else class="ls-1">没有更多啦~</p>
+              <v-btn v-if="!sNoMore" density="comfortable" @click="sLoadMore" :loading="sLoadingMore">更多</v-btn>
+              <p v-else class="ls-1">没有啦~</p>
             </v-timeline-item>
           </v-timeline>
         </v-expansion-panel-text>

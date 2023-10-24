@@ -197,7 +197,7 @@ const handleDelete = async () => {
         v-model="loadingDialog.visible"
         persistent
         width="auto">
-      <v-card color="primary">
+      <v-card>
         <v-card-text>
           {{ loadingDialog.text }}
           <v-progress-linear

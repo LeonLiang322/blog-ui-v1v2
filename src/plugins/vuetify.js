@@ -3,7 +3,7 @@ import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles'
 
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
-import { md3 } from 'vuetify/blueprints'
+import { md2 } from 'vuetify/blueprints'
 
 // Vuetify
 
@@ -12,12 +12,10 @@ import { createVuetify, ThemeDefinition } from 'vuetify'
 const myCustomLightTheme = {
   dark: false,
   colors: {
-    background: '#15191F',
-    surface: '#2f323a',
+    background: '#111',
+    surface: '#222',
     primary: '#FED504',
-    // 'primary-darken-1': '#3700B3',
     secondary: '#03DAC6',
-    // 'secondary-darken-1': '#018786',
     text: '#FFFFFF',
     error: '#E53935',
     info: '#2196F3',
@@ -33,11 +31,17 @@ export default createVuetify({
     },
     VCard: {
       elevation: 4,
-      color: 'surface'
+      color: 'surface',
+      style: [{
+        border: '2px solid transparent',
+        backgroundClip: 'padding-box, border-box',
+        backgroundOrigin: 'padding-box, border-box',
+        backgroundImage: 'linear-gradient(to right, #222, #222), linear-gradient(90deg, #FED504, #03DAC6)',
+      }]
     },
     VButton: {
       color: 'white'
-    }
+    },
   },
   theme: {
     defaultTheme: 'myCustomLightTheme',
@@ -45,7 +49,7 @@ export default createVuetify({
       myCustomLightTheme,
     },
   },
-  blueprint: md3,
+  blueprint: md2,
   icons: {
     defaultSet: 'mdi',
     aliases,
